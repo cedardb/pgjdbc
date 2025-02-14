@@ -96,7 +96,7 @@ class MiscTest {
   void warning() throws Exception {
     Connection con = TestUtil.openDB();
     Statement stmt = con.createStatement();
-    stmt.execute("CREATE TEMP TABLE t(a int primary key)");
+    stmt.execute("CREATE TABLE t(a int primary key)");
     SQLWarning warning = stmt.getWarnings();
     // We should get a warning about primary key index creation
     // it's possible we won't depending on the server's
@@ -109,7 +109,7 @@ class MiscTest {
       oos.close();
       warning = warning.getNextWarning();
     }
-
+    TestUtil.dropTable(con, "t");
     stmt.close();
     con.close();
   }

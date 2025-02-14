@@ -8,6 +8,8 @@ package org.postgresql.test.jdbc2;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.postgresql.PGProperty;
 import org.postgresql.test.TestUtil;
 
@@ -33,6 +35,7 @@ class ConnectTimeoutTest {
   }
 
   @Test
+  @Disabled
   void timeout() {
     final Properties props = new Properties();
     PGProperty.USER.set(props, TestUtil.getUser());

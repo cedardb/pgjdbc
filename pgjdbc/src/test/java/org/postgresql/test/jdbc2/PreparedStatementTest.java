@@ -12,6 +12,8 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
+
 import org.postgresql.PGStatement;
 import org.postgresql.core.ServerVersion;
 import org.postgresql.jdbc.PgStatement;
@@ -56,7 +58,7 @@ import java.util.logging.Logger;
 @RunWith(Parameterized.class)
 public class PreparedStatementTest extends BaseTest4 {
 
-  private static final int NUMERIC_MAX_PRECISION = 1000;
+  private static final int NUMERIC_MAX_PRECISION = 32;
   private static final int NUMERIC_MAX_DISPLAY_SCALE = NUMERIC_MAX_PRECISION;
 
   public PreparedStatementTest(BinaryMode binaryMode) {
@@ -359,6 +361,7 @@ public class PreparedStatementTest extends BaseTest4 {
     boolean oldStdStrings = TestUtil.getStandardConformingStrings(con);
     Statement stmt = con.createStatement();
 
+    /*
     // Test with standard_conforming_strings turned off.
     stmt.execute("SET standard_conforming_strings TO off");
     for (int i = 0; i < testStrings.length; i++) {
@@ -369,10 +372,10 @@ public class PreparedStatementTest extends BaseTest4 {
       rs.close();
       pstmt.close();
     }
-
+*/
     // Test with standard_conforming_strings turned off...
     // ... using the escape string syntax (E'').
-    stmt.execute("SET standard_conforming_strings TO on");
+    //stmt.execute("SET standard_conforming_strings TO on");
     for (int i = 0; i < testStrings.length; i++) {
       PreparedStatement pstmt = con.prepareStatement("SELECT E'" + testStrings[i] + "'");
       ResultSet rs = pstmt.executeQuery();
@@ -500,6 +503,7 @@ public class PreparedStatementTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support lseg and box types")
   public void testDoubleQuestionMark() throws SQLException {
     PreparedStatement st;
     ResultSet rs;
@@ -626,37 +630,28 @@ public class PreparedStatementTest extends BaseTest4 {
   @Test
   public void testNaNLiteralsSimpleStatement() throws SQLException {
     Statement stmt = con.createStatement();
-    ResultSet rs = stmt.executeQuery("select 'NaN'::numeric, 'NaN'::real, 'NaN'::double precision");
+    ResultSet rs = stmt.executeQuery("select 'NaN'::real, 'NaN'::double precision");
     checkNaNLiterals(stmt, rs);
   }
 
   @Test
   public void testNaNLiteralsPreparedStatement() throws SQLException {
-    PreparedStatement stmt = con.prepareStatement("select 'NaN'::numeric, 'NaN'::real, 'NaN'::double precision");
+    PreparedStatement stmt = con.prepareStatement("select 'NaN'::real, 'NaN'::double precision");
     checkNaNLiterals(stmt, stmt.executeQuery());
   }
 
   private void checkNaNLiterals(Statement stmt, ResultSet rs) throws SQLException {
     rs.next();
-    assertTrue("Double.isNaN((Double) rs.getObject", Double.isNaN((Double) rs.getObject(3)));
-    assertTrue("Double.isNaN(rs.getDouble", Double.isNaN(rs.getDouble(3)));
-    assertTrue("Float.isNaN((Float) rs.getObject", Float.isNaN((Float) rs.getObject(2)));
-    assertTrue("Float.isNaN(rs.getFloat", Float.isNaN(rs.getFloat(2)));
+    assertTrue("Double.isNaN((Double) rs.getObject", Double.isNaN((Double) rs.getObject(2)));
+    assertTrue("Double.isNaN(rs.getDouble", Double.isNaN(rs.getDouble(2)));
     assertTrue("Double.isNaN((Double) rs.getObject", Double.isNaN((Double) rs.getObject(1)));
     assertTrue("Double.isNaN(rs.getDouble", Double.isNaN(rs.getDouble(1)));
-    try {
-      rs.getBigDecimal(1);
-      fail("NaN::numeric rs.getBigDecimal");
-    } catch (SQLException e) {
-      assertEquals(PSQLState.NUMERIC_VALUE_OUT_OF_RANGE.getState(), e.getSQLState());
-      assertEquals(GT.tr("Bad value for type {0} : {1}", "BigDecimal", "NaN"), e.getMessage());
-    }
-
     rs.close();
     stmt.close();
   }
 
   @Test
+  @Ignore("We don't support Infinity literals yet")
   public void testInfinityLiteralsSimpleStatement() throws SQLException {
     assumeMinimumServerVersion("v14 introduced 'Infinity'::numeric", ServerVersion.v14);
 
@@ -669,6 +664,7 @@ public class PreparedStatementTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support Infinity literals yet")
   public void testInfinityLiteralsPreparedStatement() throws SQLException {
     assumeMinimumServerVersion("v14 introduced 'Infinity'::numeric", ServerVersion.v14);
 
@@ -715,26 +711,20 @@ public class PreparedStatementTest extends BaseTest4 {
 
   @Test
   public void testSpecialSetDoubleFloat() throws SQLException {
-    PreparedStatement ps = con.prepareStatement("select ?, ?, ?, ?, ?, ?");
-    ps.setFloat(1, Float.NaN);
-    ps.setDouble(2, Double.NaN);
-    ps.setFloat(3, Float.POSITIVE_INFINITY);
-    ps.setDouble(4, Double.POSITIVE_INFINITY);
-    ps.setFloat(5, Float.NEGATIVE_INFINITY);
-    ps.setDouble(6, Double.NEGATIVE_INFINITY);
+    PreparedStatement ps = con.prepareStatement("select ?::double, ?::double, ?::double");
+    ps.setDouble(1, Double.NaN);
+    ps.setDouble(2, Double.POSITIVE_INFINITY);
+    ps.setDouble(3, Double.NEGATIVE_INFINITY);
 
     checkNaNParams(ps);
   }
 
   @Test
   public void testSpecialSetObject() throws SQLException {
-    PreparedStatement ps = con.prepareStatement("select ?, ?, ?, ?, ?, ?");
-    ps.setObject(1, Float.NaN);
-    ps.setObject(2, Double.NaN);
-    ps.setObject(3, Float.POSITIVE_INFINITY);
-    ps.setObject(4, Double.POSITIVE_INFINITY);
-    ps.setObject(5, Float.NEGATIVE_INFINITY);
-    ps.setObject(6, Double.NEGATIVE_INFINITY);
+    PreparedStatement ps = con.prepareStatement("select ?::double, ?::double, ?::double");
+    ps.setObject(1, Double.NaN);
+    ps.setObject(2, Double.POSITIVE_INFINITY);
+    ps.setObject(3, Double.NEGATIVE_INFINITY);
 
     checkNaNParams(ps);
   }
@@ -743,18 +733,12 @@ public class PreparedStatementTest extends BaseTest4 {
     ResultSet rs = ps.executeQuery();
     rs.next();
 
-    assertTrue("Float.isNaN((Float) rs.getObject", Float.isNaN((Float) rs.getObject(1)));
-    assertTrue("Float.isNaN(rs.getFloat", Float.isNaN(rs.getFloat(1)));
-    assertTrue("Double.isNaN((Double) rs.getObject", Double.isNaN((Double) rs.getObject(2)));
-    assertTrue("Double.isNaN(rs.getDouble", Double.isNaN(rs.getDouble(2)));
-    assertEquals("Float.POSITIVE_INFINITY rs.getObject", Float.POSITIVE_INFINITY, rs.getObject(3));
-    assertEquals("Float.POSITIVE_INFINITY rs.getFloat", Float.POSITIVE_INFINITY, rs.getFloat(3), 0);
-    assertEquals("Double.POSITIVE_INFINITY rs.getObject", Double.POSITIVE_INFINITY, rs.getObject(4));
-    assertEquals("Double.POSITIVE_INFINITY rs.getDouble", Double.POSITIVE_INFINITY, rs.getDouble(4), 0);
-    assertEquals("Float.NEGATIVE_INFINITY rs.getObject", Float.NEGATIVE_INFINITY, rs.getObject(5));
-    assertEquals("Float.NEGATIVE_INFINITY rs.getFloat", Float.NEGATIVE_INFINITY, rs.getFloat(5), 0);
-    assertEquals("Double.NEGATIVE_INFINITY rs.getObject", Double.NEGATIVE_INFINITY, rs.getObject(6));
-    assertEquals("Double.NEGATIVE_INFINITY rs.getDouble", Double.NEGATIVE_INFINITY, rs.getDouble(6), 0);
+    assertTrue("Double.isNaN((Double) rs.getObject", Double.isNaN((Double) rs.getObject(1)));
+    assertTrue("Double.isNaN(rs.getDouble", Double.isNaN(rs.getDouble(1)));
+    assertEquals("Double.POSITIVE_INFINITY rs.getObject", Double.POSITIVE_INFINITY, rs.getObject(2));
+    assertEquals("Double.POSITIVE_INFINITY rs.getDouble", Double.POSITIVE_INFINITY, rs.getDouble(2), 0);
+    assertEquals("Double.NEGATIVE_INFINITY rs.getObject", Double.NEGATIVE_INFINITY, rs.getObject(3));
+    assertEquals("Double.NEGATIVE_INFINITY rs.getDouble", Double.NEGATIVE_INFINITY, rs.getDouble(3), 0);
 
     TestUtil.closeQuietly(rs);
     TestUtil.closeQuietly(ps);
@@ -846,7 +830,7 @@ public class PreparedStatementTest extends BaseTest4 {
     rs.close();
     pstmt.close();
 
-    pstmt = con.prepareStatement("TRUNCATE TABLE bool_tab");
+    pstmt = con.prepareStatement("delete from bool_tab");
     pstmt.executeUpdate();
     pstmt.close();
   }
@@ -1294,8 +1278,6 @@ public class PreparedStatementTest extends BaseTest4 {
     assertTrue("expected numeric set via String" + vs + " stored as " + rs.getBigDecimal(2),
         v.compareTo(rs.getBigDecimal(2)) == 0);
     // float is really bad...
-    assertTrue("expected numeric set via Float" + vf + " stored as " + rs.getBigDecimal(3),
-        v.compareTo(rs.getBigDecimal(3).setScale(6, RoundingMode.HALF_UP)) == 0);
     assertTrue("expected numeric set via Double" + vd + " stored as " + rs.getBigDecimal(4),
         v.compareTo(rs.getBigDecimal(4)) == 0);
 
@@ -1309,7 +1291,7 @@ public class PreparedStatementTest extends BaseTest4 {
         "n1 numeric, n2 numeric, n3 numeric, n4 numeric");
     PreparedStatement psinsert = con.prepareStatement("insert into decimal_scale values(?,?,?,?)");
     PreparedStatement psselect = con.prepareStatement("select n1,n2,n3,n4 from decimal_scale");
-    PreparedStatement pstruncate = con.prepareStatement("truncate table decimal_scale");
+    PreparedStatement pstruncate = con.prepareStatement("delete from decimal_scale");
 
     BigDecimal v = new BigDecimal("3.141593");
     String vs = v.toPlainString();
@@ -1409,6 +1391,7 @@ public class PreparedStatementTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We just support this behavior?")
   public void testUnknownSetObject() throws SQLException {
     PreparedStatement pstmt = con.prepareStatement("INSERT INTO intervaltable(i) VALUES (?)");
 

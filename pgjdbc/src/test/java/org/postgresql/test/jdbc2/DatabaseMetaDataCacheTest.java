@@ -7,6 +7,8 @@ package org.postgresql.test.jdbc2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.postgresql.core.TypeInfo;
 import org.postgresql.jdbc.PgConnection;
 import org.postgresql.test.TestUtil;
@@ -56,6 +58,7 @@ class DatabaseMetaDataCacheTest {
   }
 
   @Test
+  @Disabled("Our log has a different format")
   void getSQLTypeQueryCache() throws SQLException {
     TypeInfo ti = con.getTypeInfo();
 

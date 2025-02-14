@@ -192,7 +192,7 @@ public class BatchedInsertReWriteEnabledTest extends BaseTest4 {
       throws SQLException {
     PreparedStatement pstmt = null;
     try {
-      PreparedStatement clean = con.prepareStatement("truncate table testbatch");
+      PreparedStatement clean = con.prepareStatement("delete from testbatch");
       clean.execute();
       clean.close();
 

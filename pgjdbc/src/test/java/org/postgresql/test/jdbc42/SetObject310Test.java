@@ -10,6 +10,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import org.junit.Ignore;
+
 import org.postgresql.test.TestUtil;
 import org.postgresql.test.jdbc2.BaseTest4;
 
@@ -90,8 +92,7 @@ public class SetObject310Test extends BaseTest4 {
       TestUtil.createTable(con, "table1", "timestamp_without_time_zone_column timestamp without time zone,"
               + "timestamp_with_time_zone_column timestamp with time zone,"
               + "date_column date,"
-              + "time_without_time_zone_column time without time zone,"
-              + "time_with_time_zone_column time with time zone"
+              + "time_without_time_zone_column time without time zone"
       );
     }
   }
@@ -475,6 +476,7 @@ public class SetObject310Test extends BaseTest4 {
    * Test the behavior setObject for time columns.
    */
   @Test
+  @Ignore("We don't support timetz yet")
   public void testSetOffsetTimeWithType() throws SQLException {
     OffsetTime data = OffsetTime.parse("16:21:51+12:34");
     insertThenReadWithType(data, Types.TIME, "time_with_time_zone_column", Time.class);
@@ -484,6 +486,7 @@ public class SetObject310Test extends BaseTest4 {
    * Test the behavior setObject for time columns.
    */
   @Test
+  @Ignore("We don't support timetz yet")
   public void testSetOffsetTimeWithoutType() throws SQLException {
     OffsetTime data = OffsetTime.parse("16:21:51+12:34");
     insertThenReadWithoutType(data, "time_with_time_zone_column", Time.class);

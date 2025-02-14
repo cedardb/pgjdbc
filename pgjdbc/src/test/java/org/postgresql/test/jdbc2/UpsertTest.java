@@ -48,7 +48,7 @@ public class UpsertTest extends BaseTest4 {
     super.setUp();
     assumeMinimumServerVersion(ServerVersion.v9_5);
 
-    TestUtil.createTempTable(con, "test_statement", "i int primary key, t varchar(5)");
+    TestUtil.createTable(con, "test_statement", "i int primary key, t varchar(5)");
     Statement stmt = con.createStatement();
     stmt.executeUpdate("INSERT INTO test_statement(i, t) VALUES (42, '42')");
     TestUtil.closeQuietly(stmt);

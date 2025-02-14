@@ -1,6 +1,6 @@
 <img height="90" alt="Slonik Duke" align="right" src="docs/static/images/slonik_duke.png" />
 
-# PostgreSQL JDBC Driver
+# CedarDB-compatible tests of the PostgreSQL JDBC Driver
 
 PostgreSQL JDBC Driver (PgJDBC for short) allows Java programs to connect to a PostgreSQL database using standard, database independent Java code. Is an open source JDBC driver written in Pure Java (Type 4), and communicates in the PostgreSQL native network protocol.
 
@@ -13,6 +13,39 @@ PostgreSQL JDBC Driver (PgJDBC for short) allows Java programs to connect to a P
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.postgresql/postgresql/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.postgresql/postgresql)
 [![Javadocs](http://javadoc.io/badge/org.postgresql/postgresql.svg)](http://javadoc.io/doc/org.postgresql/postgresql)
+
+## How is this fork different from upstream?
+
+This is an untouched fork of the upstream repostitory *except* for the tests.
+Tests have been changed in the following ways:
+
+### Disabled tests
+Tests that test functionality CedarDB doesn't currently have **are disabled**.
+
+Examples are `plpgsql` or `enum` support. 
+
+See the `exclude()` calls in `/build-logic/jvm/src/main/kotlin/build-logic.test-base.gradle.kts` or
+`@Ignore` / `@Disabled` annotations at the tests.
+
+
+### Changed tests
+Tests that partially require functionality that CedarDB doesn't have, but mostly test behavior CedarDB does support **are changed** to only depend on the behavior CedarDB does support.
+
+For example, CedarDB does not support the `money` type. If a test tests 20 types, one of them being the `money` type, it has been adapted to omit that specific type.
+Those tests haven't been modified in any other way.
+
+### Rewritten tests
+Tests where CedarDB's behavior differs subtly from Postgres, but both approaches can be seen as valid have been **adapted**.
+
+For example, CedarDB only supports numerics up to a precision of 38, while postgres supports arbitrary precision numerics.
+CedarDB furthermore differentiates between `Numeric` and `BigNumeric`
+Since CedarDB won't add support for arbitrary precision numerics, we have rewritten tests that require more than 38 digits to no longer do so.
+
+## Goal
+We want to successively re-enable disabled tests whenever CedarDB gains the required
+functionality.
+
+This test suite should ensure we don't introduce any regressions.
 
 ## Supported PostgreSQL and Java versions
 The current version of the driver should be compatible with **PostgreSQL 8.4 and higher** using the version 3.0 of the protocol and **Java 8** (JDBC 4.2) or above. Unless you have unusual requirements (running old applications or JVMs), this is the driver you should be using.

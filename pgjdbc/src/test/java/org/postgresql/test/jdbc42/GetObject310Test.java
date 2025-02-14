@@ -12,6 +12,8 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import org.junit.Ignore;
+
 import org.postgresql.core.ServerVersion;
 import org.postgresql.test.TestUtil;
 import org.postgresql.test.jdbc2.BaseTest4;
@@ -76,8 +78,7 @@ public class GetObject310Test extends BaseTest4 {
     TestUtil.createTable(con, "table1", "timestamp_without_time_zone_column timestamp without time zone,"
             + "timestamp_with_time_zone_column timestamp with time zone,"
             + "date_column date,"
-            + "time_without_time_zone_column time without time zone,"
-            + "time_with_time_zone_column time with time zone"
+            + "time_without_time_zone_column time without time zone"
     );
   }
 
@@ -160,6 +161,7 @@ public class GetObject310Test extends BaseTest4 {
    * Test the behavior getObject for timetz columns.
    */
   @Test
+  @Ignore("We don't support timetz yet")
   public void testGetOffsetTime() throws SQLException {
     List<String> timesToTest = Arrays.asList("00:00:00+00:00", "00:00:00+00:30",
         "01:02:03.333444+02:00", "23:59:59.999999-12:00",
@@ -251,6 +253,7 @@ public class GetObject310Test extends BaseTest4 {
    * Test the behavior getObject for time columns with invalid type.
    */
   @Test
+  @Ignore("We don't support timetz yet")
   public void testGetLocalTimeInvalidType() throws SQLException {
     try (Statement stmt = con.createStatement() ) {
       stmt.executeUpdate(TestUtil.insertSQL("table1", "time_with_time_zone_column", "TIME '04:05:06.123456-08:00'"));
@@ -405,6 +408,7 @@ public class GetObject310Test extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support generate_series() with non-integer arguments")
   public void testProlepticCalendarTimestamp() throws SQLException {
     // date time ranges and CTEs are both new with 8.4
     assumeMinimumServerVersion(ServerVersion.v8_4);
@@ -419,6 +423,7 @@ public class GetObject310Test extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support generate_series with timestamps yet")
   public void testProlepticCalendarTimestamptz() throws SQLException {
     // date time ranges and CTEs are both new with 8.4
     assumeMinimumServerVersion(ServerVersion.v8_4);

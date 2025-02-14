@@ -41,8 +41,39 @@ public class OidValuesCorrectnessTest extends BaseTest4 {
    * Prevents situation that a new value will be added to Oid class with ignoring the test.
    */
   private static List<String> oidsToIgnore = Arrays.asList(
-      "UNSPECIFIED" //UNSPECIFIED isn't an Oid, it's a value to specify that Oid value is unspecified
+      "UNSPECIFIED",//UNSPECIFIED isn't an Oid, it's a value to specify that Oid value is unspecified
+      "FLOAT4", // We don't support the following types yet
+      "FLOAT4_ARRAY",
+      "TIMETZ",
+      "TIMETZ_ARRAY",
+      "OID",
+      "OID_ARRAY",
+      "MONEY",
+      "MONEY_ARRAY",
+      "XML",
+      "XML_ARRAY",
+      "POINT",
+      "POINT_ARRAY",
+      "BOX",
+      "BOX_ARRAY",
+      "REF_CURSOR",
+      "REF_CURSOR_ARRAY",
+      "LINE",
+      "LSEG",
+      "PATH",
+      "POLYGON",
+      "CIRCLE",
+      "CIDR",
+      "INET",
+      "MACADDR",
+      "MACADDR8",
+      "TSVECTOR",
+      "TSQUERY",
+      "VARCHAR_ARRAY", // We only support text arrays
+      "CHAR", // We only support blank padded chars or varchars
+      "CHAR_ARRAY"
   );
+
 
   /**
    * Map to contain Oid names with server version of their support.

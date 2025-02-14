@@ -421,7 +421,7 @@ public class CursorFetchTest extends BaseTest4 {
   public void testGetRow() throws SQLException {
     Statement stmt = con.createStatement();
     stmt.setFetchSize(1);
-    ResultSet rs = stmt.executeQuery("SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3");
+    ResultSet rs = stmt.executeQuery("select generate_series as id from generate_series(1,3) order by id asc");
     int count = 0;
     while (rs.next()) {
       count++;

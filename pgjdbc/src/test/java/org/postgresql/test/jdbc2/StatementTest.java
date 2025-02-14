@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.*;
+
 import org.postgresql.Driver;
 import org.postgresql.PGProperty;
 import org.postgresql.core.ServerVersion;
@@ -22,12 +24,6 @@ import org.postgresql.test.util.StrangeProxyServer;
 import org.postgresql.util.LazyCleaner;
 import org.postgresql.util.PSQLState;
 import org.postgresql.util.SharedTimer;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -375,6 +371,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support to_char(timestamptz) whcih a lot of those functions require")
   void dateFunctions() throws SQLException {
     Statement stmt = con.createStatement();
     ResultSet rs = stmt.executeQuery("select {fn curdate()},{fn curtime()}"
@@ -472,14 +469,16 @@ class StatementTest {
   void warningsAreCleared() throws SQLException {
     Statement stmt = con.createStatement();
     // Will generate a NOTICE: for primary key index creation
-    stmt.execute("CREATE TEMP TABLE unused (a int primary key)");
+    stmt.execute("CREATE TABLE unused (a int primary key)");
     stmt.executeQuery("SELECT 1");
     // Executing another query should clear the warning from the first one.
     assertNull(stmt.getWarnings());
+    stmt.execute("DROP TABLE unused");
     stmt.close();
   }
 
   @Test
+  @Disabled("We don't support plpgsql yet")
   void warningsAreAvailableAsap()
       throws Exception {
     try (Connection outerLockCon = TestUtil.openDB()) {
@@ -544,6 +543,7 @@ class StatementTest {
    * this should happen more or less instantaneously even if you receive a lot of warnings.</p>
    */
   @Test
+  @Disabled("We don't support plpgsql yet")
   void concurrentWarningReadAndClear()
       throws SQLException, InterruptedException, ExecutionException, TimeoutException {
     final int iterations = 1000;
@@ -611,6 +611,7 @@ class StatementTest {
    * multiple rule actions together in one statement.
    */
   @Test
+  @Disabled("We don't support rules yet")
   void parsingSemiColons() throws SQLException {
     Statement stmt = con.createStatement();
     stmt.execute(
@@ -699,6 +700,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support pg_sleep")
   void setQueryTimeout() throws SQLException {
     Statement stmt = con.createStatement();
     long start = 0;
@@ -766,6 +768,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support pg_sleep yet")
   void setQueryTimeoutWithSleep() throws SQLException, InterruptedException {
     // check that the timeout starts ticking at execute, not at the
     // setQueryTimeout call.
@@ -784,6 +787,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support pg_sleep yet")
   void setQueryTimeoutOnPrepared() throws SQLException, InterruptedException {
     // check that a timeout set on a prepared statement works on every
     // execution.
@@ -803,6 +807,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support pg_sleep yet")
   void setQueryTimeoutWithoutExecute() throws SQLException, InterruptedException {
     // check that a timeout set on one statement doesn't affect another
     Statement stmt1 = con.createStatement();
@@ -892,6 +897,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support table locks yet")
   @Timeout(10)
   void closeInProgressStatement() throws Exception {
     ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -997,6 +1003,7 @@ class StatementTest {
   }
 
   @Test
+  @Disabled("We don't support plpgsql functions yet")
   @Timeout(20)
   void fastCloses() throws SQLException {
     ExecutorService executor = Executors.newSingleThreadExecutor();

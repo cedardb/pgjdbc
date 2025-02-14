@@ -160,11 +160,17 @@ public class BatchFailureTest extends BaseTest4 {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    TestUtil.createTempTable(con, "batchUpdCnt", "id varchar(512) primary key, data varchar(512)");
+    TestUtil.createTable(con, "batchUpdCnt", "id varchar(512) primary key, data varchar(512)");
     Statement stmt = con.createStatement();
     stmt.executeUpdate("INSERT INTO batchUpdCnt(id) VALUES ('key-2')");
     stmt.close();
     con.setAutoCommit(autoCommit == AutoCommit.YES);
+  }
+
+  @Override
+  public void tearDown() throws SQLException {
+    TestUtil.dropTable(con, "batchUpdCnt");
+    TestUtil.closeDB(con);
   }
 
   @Test

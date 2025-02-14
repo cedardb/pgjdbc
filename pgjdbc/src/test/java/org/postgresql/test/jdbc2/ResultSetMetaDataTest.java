@@ -9,6 +9,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
+
 import org.postgresql.PGProperty;
 import org.postgresql.PGResultSetMetaData;
 import org.postgresql.core.ServerVersion;
@@ -73,7 +75,7 @@ public class ResultSetMetaDataTest extends BaseTest4 {
     TestUtil.createTable(conn, "rsmd1", "a int primary key, b text, c decimal(10,2)");
     TestUtil.createTable(conn, "rsmd_cache", "a int primary key");
     TestUtil.createTable(conn, "timetest",
-        "tm time(3), tmtz timetz, ts timestamp without time zone, tstz timestamp(6) with time zone");
+        "tm time, ts timestamp without time zone, tstz timestamp with time zone"); // We don't support time without timezone or scale on time types
 
     TestUtil.dropSequence(conn, "serialtest_a_seq");
     TestUtil.dropSequence(conn, "serialtest_b_seq");
@@ -84,15 +86,13 @@ public class ResultSetMetaDataTest extends BaseTest4 {
 
     TestUtil.createTable(conn, "serialtest", "a serial, b bigserial, c int");
     TestUtil.createTable(conn, "alltypes",
-        "bool boolean, i2 int2, i4 int4, i8 int8, num numeric(10,2), re real, fl float, ch char(3), vc varchar(3), tx text, d date, t time without time zone, tz time with time zone, ts timestamp without time zone, tsz timestamp with time zone, bt bytea");
+        "bool boolean, i2 int2, i4 int4, i8 int8, num numeric(10,2), re real, ch char(3), vc varchar(3), tx text, d date, t time without time zone, ts timestamp without time zone, tsz timestamp with time zone, bt bytea");
     TestUtil.createTable(conn, "sizetest",
-        "fixedchar char(5), fixedvarchar varchar(5), unfixedvarchar varchar, txt text, bytearr bytea, num64 numeric(6,4), num60 numeric(6,0), num numeric, ip inet");
-    TestUtil.createTable(conn, "compositetest", "col rsmd1");
+        "fixedchar char(5), fixedvarchar varchar(5), unfixedvarchar varchar, txt text, bytearr bytea, num64 numeric(6,4), num60 numeric(6,0), num numeric");
   }
 
   @Override
   public void tearDown() throws SQLException {
-    TestUtil.dropTable(conn, "compositetest");
     TestUtil.dropTable(conn, "rsmd1");
     TestUtil.dropTable(conn, "rsmd_cache");
     TestUtil.dropTable(conn, "timetest");
@@ -192,25 +192,26 @@ public class ResultSetMetaDataTest extends BaseTest4 {
     resultSet.close();
   }
 
+  @Ignore("We don't support variable sized timestamps")
   @Test
   public void testTimestampInfo() throws SQLException {
     Statement stmt = conn.createStatement();
-    ResultSet rs = stmt.executeQuery("SELECT tm, tmtz, ts, tstz FROM timetest");
+    ResultSet rs = stmt.executeQuery("SELECT tm, ts, tstz FROM timetest");
     ResultSetMetaData rsmd = rs.getMetaData();
 
     // For reference:
-    // TestUtil.createTable(con, "timetest", "tm time(3), tmtz timetz, ts timestamp without time
+    // TestUtil.createTable(con, "timetest", "tm time(3), ts timestamp without time
     // zone, tstz timestamp(6) with time zone");
 
     assertEquals(3, rsmd.getScale(1));
     assertEquals(6, rsmd.getScale(2));
+    assertEquals(6, rsmd.getScale(2));
     assertEquals(6, rsmd.getScale(3));
-    assertEquals(6, rsmd.getScale(4));
 
     assertEquals(12, rsmd.getColumnDisplaySize(1));
     assertEquals(21, rsmd.getColumnDisplaySize(2));
-    assertEquals(29, rsmd.getColumnDisplaySize(3));
-    assertEquals(35, rsmd.getColumnDisplaySize(4));
+    assertEquals(29, rsmd.getColumnDisplaySize(2));
+    assertEquals(35, rsmd.getColumnDisplaySize(3));
 
     rs.close();
     stmt.close();
@@ -219,8 +220,9 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   @Test
   public void testColumnDisplaySize() throws SQLException {
     Statement stmt = conn.createStatement();
+    // We don't support the IP type and arbitrary precision numerics
     ResultSet rs = stmt.executeQuery(
-        "SELECT fixedchar, fixedvarchar, unfixedvarchar, txt, bytearr, num64, num60, num, ip FROM sizetest");
+        "SELECT fixedchar, fixedvarchar, unfixedvarchar, txt, bytearr, num64, num60 FROM sizetest");
     ResultSetMetaData rsmd = rs.getMetaData();
 
     assertEquals(5, rsmd.getColumnDisplaySize(1));
@@ -230,8 +232,8 @@ public class ResultSetMetaDataTest extends BaseTest4 {
     assertEquals(Integer.MAX_VALUE, rsmd.getColumnDisplaySize(5));
     assertEquals(8, rsmd.getColumnDisplaySize(6));
     assertEquals(7, rsmd.getColumnDisplaySize(7));
-    assertEquals(131089, rsmd.getColumnDisplaySize(8));
-    assertEquals(Integer.MAX_VALUE, rsmd.getColumnDisplaySize(9));
+    //assertEquals(131089, rsmd.getColumnDisplaySize(8));
+    //assertEquals(Integer.MAX_VALUE, rsmd.getColumnDisplaySize(9));
   }
 
   @Test
@@ -254,7 +256,7 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   public void testClassesMatch() throws SQLException {
     Statement stmt = conn.createStatement();
     stmt.executeUpdate(
-        "INSERT INTO alltypes (bool, i2, i4, i8, num, re, fl, ch, vc, tx, d, t, tz, ts, tsz, bt) VALUES ('t', 2, 4, 8, 3.1, 3.14, 3.141, 'c', 'vc', 'tx', '2004-04-09', '09:01:00', '11:11:00-01','2004-04-09 09:01:00','1999-09-19 14:23:12-09', '\\\\123')");
+        "INSERT INTO alltypes (bool, i2, i4, i8, num, re, ch, vc, tx, d, t, ts, tsz, bt) VALUES ('t', 2, 4, 8, 3.1, 3.14, 'c', 'vc', 'tx', '2004-04-09', '09:01:00', '2004-04-09 09:01:00','1999-09-19 14:23:12-09', '\\\\123')");
     ResultSet rs = stmt.executeQuery("SELECT * FROM alltypes");
     ResultSetMetaData rsmd = rs.getMetaData();
     assertTrue(rs.next());
@@ -264,6 +266,7 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support composite types yet")
   public void testComposite() throws Exception {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT col FROM compositetest");
@@ -273,6 +276,7 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support composite types yet")
   public void testUnexecutedStatement() throws Exception {
     assumePreparedStatementMetadataSupported();
     PreparedStatement pstmt = conn.prepareStatement("SELECT col FROM compositetest");
@@ -283,6 +287,7 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support composite types yet")
   public void testClosedResultSet() throws Exception {
     assumePreparedStatementMetadataSupported();
     PreparedStatement pstmt = conn.prepareStatement("SELECT col FROM compositetest");
@@ -307,6 +312,7 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   // Verifies that the field metadatacache will cache when enabled and also functions properly
   // when disabled.
   @Test
+  @Ignore("We don't support rename yet")
   public void testCache() throws Exception {
     boolean isCacheDisabled = Integer.valueOf(0).equals(databaseMetadataCacheFields)
                            || Integer.valueOf(0).equals(databaseMetadataCacheFieldsMib);
@@ -361,12 +367,13 @@ public class ResultSetMetaDataTest extends BaseTest4 {
   @Test
   public void testSmallSerialSequenceLikeColumns() throws SQLException {
     Statement stmt = con.createStatement();
+    stmt.execute("DROP TABLE IF EXISTS smallserial_test");
+    stmt.execute("DROP SEQUENCE IF EXISTS smallserial_test_a_seq");
     // This is the equivalent of the smallserial, not the actual smallserial
     stmt.execute("CREATE SEQUENCE smallserial_test_a_seq;\n"
         + "CREATE TABLE smallserial_test (\n"
         + "    a smallint NOT NULL DEFAULT nextval('smallserial_test_a_seq')\n"
-        + ");\n"
-        + "ALTER SEQUENCE smallserial_test_a_seq OWNED BY smallserial_test.a;");
+        + ");");
 
     ResultSet rs = stmt.executeQuery("SELECT a FROM smallserial_test");
     ResultSetMetaData rsmd = rs.getMetaData();

@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.postgresql.test.TestUtil;
 
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,7 @@ class NetworkTimeoutTest {
   }
 
   @Test
+  @Disabled("We don't support pg_sleep yet")
   void setNetworkTimeoutEnforcement() throws Exception {
     Connection conn = TestUtil.openDB();
     Statement stmt = null;

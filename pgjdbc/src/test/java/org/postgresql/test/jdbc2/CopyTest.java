@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.postgresql.PGConnection;
 import org.postgresql.copy.CopyIn;
 import org.postgresql.copy.CopyManager;
@@ -414,6 +416,7 @@ class CopyTest {
   }
 
   @Test
+  @Disabled("We don't support pg_terminate_backend() yet")
   void lockReleaseOnCancelFailure() throws SQLException, InterruptedException {
     if (!TestUtil.haveMinimumServerVersion(con, ServerVersion.v8_4)) {
       // pg_backend_pid() requires PostgreSQL 8.4+

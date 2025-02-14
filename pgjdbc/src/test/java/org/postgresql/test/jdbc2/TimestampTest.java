@@ -11,6 +11,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
+import org.junit.Ignore;
+
 import org.postgresql.PGStatement;
 import org.postgresql.core.BaseConnection;
 import org.postgresql.core.ServerVersion;
@@ -119,6 +121,7 @@ public class TimestampTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support the infinity literal")
   public void testInfinity() throws SQLException {
     runInfinityTests(TSWTZ_TABLE, PGStatement.DATE_POSITIVE_INFINITY);
     runInfinityTests(TSWTZ_TABLE, PGStatement.DATE_NEGATIVE_INFINITY);
@@ -322,7 +325,7 @@ public class TimestampTest extends BaseTest4 {
     // Fall through helper
     timestampTestWOTZ();
 
-    assertEquals(50, stmt.executeUpdate("DELETE FROM " + TSWOTZ_TABLE));
+    assertEquals(40, stmt.executeUpdate("DELETE FROM " + TSWOTZ_TABLE));
 
     stmt.close();
   }
@@ -368,7 +371,7 @@ public class TimestampTest extends BaseTest4 {
     // Fall through helper
     timestampTestWOTZ();
 
-    assertEquals(50, stmt.executeUpdate("DELETE FROM " + TSWOTZ_TABLE));
+    assertEquals(40, stmt.executeUpdate("DELETE FROM " + TSWOTZ_TABLE));
 
     pstmt.close();
     stmt.close();
@@ -506,24 +509,6 @@ public class TimestampTest extends BaseTest4 {
       assertTrue(rs.next());
       t = rs.getTimestamp(1);
       assertNotNull(t);
-      assertEquals(TS5WOTZ, t);
-
-      tString = rs.getString(1);
-      assertNotNull(tString);
-      assertEquals(TS5WOTZ_PGFORMAT, tString);
-
-      assertTrue(rs.next());
-      t = rs.getTimestamp(1);
-      assertNotNull(t);
-      assertEquals(TS6WOTZ, t);
-
-      tString = rs.getString(1);
-      assertNotNull(tString);
-      assertEquals(TS6WOTZ_PGFORMAT, tString);
-
-      assertTrue(rs.next());
-      t = rs.getTimestamp(1);
-      assertNotNull(t);
       assertEquals(TS7WOTZ, t);
 
       tString = rs.getString(1);
@@ -576,22 +561,17 @@ public class TimestampTest extends BaseTest4 {
   public void testJavaTimestampFromSQLTime() throws SQLException {
     Statement st = con.createStatement();
     ResultSet rs = st.executeQuery("SELECT '00:00:05.123456'::time as t, '1970-01-01 00:00:05.123456'::timestamp as ts, "
-        + "'00:00:05.123456 +0300'::time with time zone as tz, '1970-01-01 00:00:05.123456 +0300'::timestamp with time zone as tstz ");
+        + "'1970-01-01 00:00:05.123456 +0300'::timestamp with time zone as tstz ");
     rs.next();
     Timestamp t = rs.getTimestamp("t");
     Timestamp ts = rs.getTimestamp("ts");
-    Timestamp tz = rs.getTimestamp("tz");
 
-    Timestamp tstz = rs.getTimestamp("tstz");
 
     Integer desiredNanos = 123456000;
     Integer tNanos = t.getNanos();
-    Integer tzNanos = tz.getNanos();
 
     assertEquals("Time should be microsecond-accurate", desiredNanos, tNanos);
-    assertEquals("Time with time zone should be microsecond-accurate", desiredNanos, tzNanos);
     assertEquals("Unix epoch timestamp and Time should match", ts, t);
-    assertEquals("Unix epoch timestamp with time zone and time with time zone should match", tstz, tz);
   }
 
   private static Timestamp getTimestamp(int y, int m, int d, int h, int mn, int se, int f,
@@ -654,13 +634,6 @@ public class TimestampTest extends BaseTest4 {
       getTimestamp(2000, 7, 7, 15, 0, 0, 123456000, null);
   private static final String TS4WOTZ_PGFORMAT = "2000-07-07 15:00:00.123456";
 
-  private static final Timestamp TS5WOTZ =
-      new Timestamp(PGStatement.DATE_NEGATIVE_INFINITY);
-  private static final String TS5WOTZ_PGFORMAT = "-infinity";
-
-  private static final Timestamp TS6WOTZ =
-      new Timestamp(PGStatement.DATE_POSITIVE_INFINITY);
-  private static final String TS6WOTZ_PGFORMAT = "infinity";
 
   private static final Timestamp TS7WOTZ =
       getTimestamp(2000, 7, 7, 15, 0, 0, 0, null);
@@ -685,13 +658,13 @@ public class TimestampTest extends BaseTest4 {
   private static final String TS10WOTZ_ROUNDED_PGFORMAT = "2019-01-01 00:00:00";
 
   private static final Timestamp[] TS__WOTZ = {
-    TS1WOTZ, TS2WOTZ, TS3WOTZ, TS4WOTZ, TS5WOTZ,
-    TS6WOTZ, TS7WOTZ, TS8WOTZ, TS9WOTZ, TS10WOTZ,
+    TS1WOTZ, TS2WOTZ, TS3WOTZ, TS4WOTZ,
+    TS7WOTZ, TS8WOTZ, TS9WOTZ, TS10WOTZ,
   };
 
   private static final String[] TS__WOTZ_PGFORMAT = {
-    TS1WOTZ_PGFORMAT, TS2WOTZ_PGFORMAT, TS3WOTZ_PGFORMAT, TS4WOTZ_PGFORMAT, TS5WOTZ_PGFORMAT,
-    TS6WOTZ_PGFORMAT, TS7WOTZ_PGFORMAT, TS8WOTZ_PGFORMAT, TS9WOTZ_PGFORMAT, TS10WOTZ_PGFORMAT,
+    TS1WOTZ_PGFORMAT, TS2WOTZ_PGFORMAT, TS3WOTZ_PGFORMAT, TS4WOTZ_PGFORMAT,
+    TS7WOTZ_PGFORMAT, TS8WOTZ_PGFORMAT, TS9WOTZ_PGFORMAT, TS10WOTZ_PGFORMAT,
   };
 
   private static final String TSWTZ_TABLE = "testtimestampwtz";
@@ -715,10 +688,6 @@ public class TimestampTest extends BaseTest4 {
   private static final java.sql.Time tmpTime3WOTZ = new java.sql.Time(TS3WOTZ.getTime());
   private static final java.sql.Date tmpDate4WOTZ = new java.sql.Date(TS4WOTZ.getTime());
   private static final java.sql.Time tmpTime4WOTZ = new java.sql.Time(TS4WOTZ.getTime());
-  private static final java.sql.Date tmpDate5WOTZ = new java.sql.Date(TS5WOTZ.getTime());
-  private static final java.sql.Date tmpTime5WOTZ = new java.sql.Date(TS5WOTZ.getTime());
-  private static final java.sql.Date tmpDate6WOTZ = new java.sql.Date(TS6WOTZ.getTime());
-  private static final java.sql.Date tmpTime6WOTZ = new java.sql.Date(TS6WOTZ.getTime());
   private static final java.sql.Date tmpDate7WOTZ = new java.sql.Date(TS7WOTZ.getTime());
   private static final java.sql.Time tmpTime7WOTZ = new java.sql.Time(TS7WOTZ.getTime());
   private static final java.sql.Date tmpDate8WOTZ = new java.sql.Date(TS8WOTZ.getTime());
@@ -729,9 +698,9 @@ public class TimestampTest extends BaseTest4 {
   private static final java.sql.Time tmpTime10WOTZ = new java.sql.Time(TS10WOTZ.getTime());
 
   private static final java.util.Date[] TEST_DATE_TIMES = {
-      tmpDate1WOTZ, tmpDate2WOTZ, tmpDate3WOTZ, tmpDate4WOTZ, tmpDate5WOTZ,
-      tmpDate6WOTZ, tmpDate7WOTZ, tmpDate8WOTZ, tmpDate9WOTZ, tmpDate10WOTZ,
-      tmpTime1WOTZ, tmpTime2WOTZ, tmpTime3WOTZ, tmpTime4WOTZ, tmpTime5WOTZ,
-      tmpTime6WOTZ, tmpTime7WOTZ, tmpTime8WOTZ, tmpTime9WOTZ, tmpTime10WOTZ,
+      tmpDate1WOTZ, tmpDate2WOTZ, tmpDate3WOTZ, tmpDate4WOTZ,
+      tmpDate7WOTZ, tmpDate8WOTZ, tmpDate9WOTZ, tmpDate10WOTZ,
+      tmpTime1WOTZ, tmpTime2WOTZ, tmpTime3WOTZ, tmpTime4WOTZ,
+      tmpTime7WOTZ, tmpTime8WOTZ, tmpTime9WOTZ, tmpTime10WOTZ,
   };
 }

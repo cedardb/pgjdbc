@@ -47,7 +47,7 @@ public class ParameterMetaDataTest extends BaseTest4 {
     Assume.assumeTrue("simple protocol only does not support describe statement requests",
         preferQueryMode != PreferQueryMode.SIMPLE);
     TestUtil.createTable(con, "parametertest",
-        "a int4, b float8, c text, d point, e timestamp with time zone");
+        "a int4, b float8, c text, e timestamp with time zone");
   }
 
   @Override
@@ -59,20 +59,16 @@ public class ParameterMetaDataTest extends BaseTest4 {
   @Test
   public void testParameterMD() throws SQLException {
     PreparedStatement pstmt =
-        con.prepareStatement("SELECT a FROM parametertest WHERE b = ? AND c = ? AND d >^ ? ");
+        con.prepareStatement("SELECT a FROM parametertest WHERE b = ? AND c = ?");
     ParameterMetaData pmd = pstmt.getParameterMetaData();
 
-    assertEquals(3, pmd.getParameterCount());
+    assertEquals(2, pmd.getParameterCount());
     assertEquals(Types.DOUBLE, pmd.getParameterType(1));
     assertEquals("float8", pmd.getParameterTypeName(1));
     assertEquals("java.lang.Double", pmd.getParameterClassName(1));
     assertEquals(Types.VARCHAR, pmd.getParameterType(2));
     assertEquals("text", pmd.getParameterTypeName(2));
     assertEquals("java.lang.String", pmd.getParameterClassName(2));
-    assertEquals(Types.OTHER, pmd.getParameterType(3));
-    assertEquals("point", pmd.getParameterTypeName(3));
-    assertEquals("org.postgresql.geometric.PGpoint", pmd.getParameterClassName(3));
-
     pstmt.close();
   }
 

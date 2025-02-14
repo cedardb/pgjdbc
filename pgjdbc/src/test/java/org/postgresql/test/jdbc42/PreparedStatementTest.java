@@ -11,6 +11,7 @@ import org.postgresql.test.jdbc2.BaseTest4;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -29,14 +30,12 @@ public class PreparedStatementTest extends BaseTest4 {
   public void setUp() throws Exception {
     super.setUp();
     TestUtil.createTable(con, "timestamptztable", "tstz timestamptz");
-    TestUtil.createTable(con, "timetztable", "ttz timetz");
     TestUtil.createTable(con, "timetable", "id serial, tt time");
   }
 
   @Override
   public void tearDown() throws SQLException {
     TestUtil.dropTable(con, "timestamptztable");
-    TestUtil.dropTable(con, "timetztable");
     TestUtil.dropTable(con, "timetable");
     super.tearDown();
   }
@@ -51,7 +50,7 @@ public class PreparedStatementTest extends BaseTest4 {
     BigDecimal d = rs.getBigDecimal(1);
     pstmt.close();
 
-    Assert.assertEquals(new BigDecimal("3.2"), d);
+    Assert.assertEquals(new BigDecimal("3.200000"), d);
   }
 
   @Test
@@ -82,6 +81,7 @@ public class PreparedStatementTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support the timetz type")
   public void testTimeTzSetNull() throws SQLException {
     PreparedStatement pstmt = con.prepareStatement("INSERT INTO timetztable (ttz) VALUES (?)");
 

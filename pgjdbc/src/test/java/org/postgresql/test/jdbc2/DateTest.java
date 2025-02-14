@@ -58,7 +58,7 @@ public class DateTest extends BaseTest4 {
           "Europe/Berlin", "Europe/Moscow", "Pacific/Apia", "America/Los_Angeles");
       // some selection of static GMT offsets (not all, as this takes too long):
       tzIds = Stream.concat(tzIds, IntStream.of(-12, -11, -5, -1, 0, 1, 3, 12, 13)
-          .mapToObj(i -> String.format(Locale.ROOT, "GMT%+02d", i)));
+          .mapToObj(i -> String.format(Locale.ROOT, "%d", i)));
       for (String tzId : (Iterable<String>) tzIds::iterator) {
         for (BinaryMode binaryMode : BinaryMode.values()) {
           data.add(new Object[]{type, tzId, binaryMode});

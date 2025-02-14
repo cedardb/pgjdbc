@@ -86,7 +86,7 @@ public class TestReturning extends BaseTest4 {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    TestUtil.createTempTable(con, "genkeys", "\"Id\" serial, b varchar(5), c int");
+    TestUtil.createTable(con, "genkeys", "\"Id\" serial, b varchar(5), c int");
   }
 
   @Override

@@ -106,7 +106,7 @@ public class ResultSetTest extends BaseTest4 {
     stmt.executeUpdate("INSERT INTO testboolstring VALUES('1.0', null)");
     stmt.executeUpdate("INSERT INTO testboolstring VALUES('0.0', null)");
 
-    TestUtil.createTable(con, "testboolfloat", "i int, a float4, b boolean");
+    TestUtil.createTable(con, "testboolfloat", "i int, a real, b boolean");
     stmt.executeUpdate("INSERT INTO testboolfloat VALUES(1, '1.0'::real, true)");
     stmt.executeUpdate("INSERT INTO testboolfloat VALUES(2, '0.0'::real, false)");
     stmt.executeUpdate("INSERT INTO testboolfloat VALUES(3, 1.000::real, true)");
@@ -138,13 +138,13 @@ public class ResultSetTest extends BaseTest4 {
 
     // TestUtil.createTable(con, "testbit", "a bit");
 
-    TestUtil.createTable(con, "testnumeric", "t text, a numeric");
+    TestUtil.createTable(con, "testnumeric", "t text, a bignumeric(38,14)");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('1.0', '1.0')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('0.0', '0.0')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('-1.0', '-1.0')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('1.2', '1.2')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('-2.5', '-2.5')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('0.000000000000000000000000000990', '0.000000000000000000000000000990')");
+    stmt.executeUpdate("INSERT INTO testnumeric VALUES('0.0000000000990', '0.0000000000990')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('10.0000000000099', '10.0000000000099')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('.10000000000000', '.10000000000000')");
     stmt.executeUpdate("INSERT INTO testnumeric VALUES('.10', '.10')");
@@ -379,10 +379,10 @@ public class ResultSetTest extends BaseTest4 {
     testgetBoolean("int2"); // SMALLINT
     testgetBoolean("int4"); // INTEGER
     testgetBoolean("int8"); // BIGINT
-    testgetBoolean("float4"); // REAL
+    testgetBoolean("real"); // REAL
     testgetBoolean("float8"); // FLOAT, DOUBLE
-    testgetBoolean("numeric"); // DECIMAL, NUMERIC
-    testgetBoolean("bpchar"); // CHAR
+    testgetBoolean("numeric(1,0)"); // DECIMAL, NUMERIC
+    testgetBoolean("char"); // CHAR
     testgetBoolean("varchar"); // VARCHAR
     testgetBoolean("text"); // LONGVARCHAR?
   }
@@ -415,7 +415,8 @@ public class ResultSetTest extends BaseTest4 {
     testBadBoolean("'2017-03-13 14:25:48.130861'::timestamp", "2017-03-13 14:25:48.130861");
     testBadBoolean("'2017-03-13'::date", "2017-03-13");
     testBadBoolean("'2017-03-13 14:25:48.130861'::time", "14:25:48.130861");
-    testBadBoolean("ARRAY[[1,0],[0,1]]", "{{1,0},{0,1}}");
+    // We don't support binary output for arrays yet
+    //testBadBoolean("ARRAY[[1,0],[0,1]]", "{{1,0},{0,1}}");
     testBadBoolean("29::bit(4)", "1101");
   }
 
@@ -637,7 +638,7 @@ public class ResultSetTest extends BaseTest4 {
     assertEquals(-2, rs.getLong(1));
     rs.close();
 
-    rs = con.createStatement().executeQuery("select a from testnumeric where t = '0.000000000000000000000000000990'");
+    rs = con.createStatement().executeQuery("select a from testnumeric where t = '0.0000000000990'");
     assertTrue(rs.next());
     assertEquals(0, rs.getLong(1));
     rs.close();
@@ -803,122 +804,122 @@ public class ResultSetTest extends BaseTest4 {
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '1.0'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(1.0), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(1), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '0.0'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(0.0), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(0), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-1.0'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(-1.0), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(-1), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '1.2'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(1.2), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(1.2), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-2.5'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(-2.5), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(-2.5), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
-    rs = con.createStatement().executeQuery("select a from testnumeric where t = '0.000000000000000000000000000990'");
+    rs = con.createStatement().executeQuery("select a from testnumeric where t = '0.0000000000990'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("0.000000000000000000000000000990"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("0.000000000099"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '10.0000000000099'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("10.0000000000099"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("10.0000000000099"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '.10000000000000'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("0.10000000000000"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("0.1"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '.10'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("0.10"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("0.1"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '1.10000000000000'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("1.10000000000000"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("1.1"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '99999.2'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(99999.2), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(99999.2), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '99999'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(99999), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(99999), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-99999.2'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(-99999.2), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(-99999.2), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-99999'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(-99999), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(-99999), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '2147483647'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(2147483647), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(2147483647), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-2147483648'");
     assertTrue(rs.next());
-    assertEquals(BigDecimal.valueOf(-2147483648), rs.getBigDecimal(1));
+    assertEquals(BigDecimal.valueOf(-2147483648), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '2147483648'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("2147483648"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("2147483648"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-2147483649'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("-2147483649"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("-2147483649"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '9223372036854775807'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("9223372036854775807"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("9223372036854775807"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '9223372036854775807.9'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("9223372036854775807.9"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("9223372036854775807.9"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-9223372036854775808'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("-9223372036854775808"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("-9223372036854775808"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '9223372036854775808'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("9223372036854775808"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("9223372036854775808"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '-9223372036854775809'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("-9223372036854775809"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("-9223372036854775809"), rs.getBigDecimal(1).stripTrailingZeros());
     rs.close();
 
     rs = con.createStatement().executeQuery("select a from testnumeric where t = '10223372036850000000'");
     assertTrue(rs.next());
-    assertEquals(new BigDecimal("10223372036850000000"), rs.getBigDecimal(1));
+    assertEquals(new BigDecimal("10223372036850000000.00000000000000"), rs.getBigDecimal(1));
     rs.close();
   }
 
@@ -1022,7 +1023,7 @@ public class ResultSetTest extends BaseTest4 {
     Statement stmt =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     // Create a one row result set.
-    ResultSet rs = stmt.executeQuery("SELECT * FROM pg_database WHERE datname='template1'");
+    ResultSet rs = stmt.executeQuery("SELECT * FROM pg_database WHERE datname='postgres'");
 
     assertTrue(rs.isBeforeFirst());
     assertTrue(!rs.isAfterLast());
@@ -1412,7 +1413,7 @@ public class ResultSetTest extends BaseTest4 {
       try (Statement statement = connection.createStatement()) {
         for (int i = 0; i < 10; i++) {
           try (ResultSet resultSet = statement.executeQuery(
-              String.format("SELECT unnest(array_fill('8/10/%d'::timestamp, ARRAY[%d]))",
+              String.format("SELECT unnest(array_fill('%d-10-8'::timestamp, ARRAY[%d]))",
                   expectedYear, 500))) {
             while (resultSet.next()) {
               Timestamp d = resultSet.getTimestamp(1);

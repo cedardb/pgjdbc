@@ -48,18 +48,17 @@ public class NumericTransferTest extends BaseTest4 {
   public void receive100000() throws SQLException {
     Statement statement = con.createStatement();
     for (String sign : new String[]{"", "-"}) {
-      for (int i = 0; i < 100; i++) {
-        final String sql = "SELECT " + sign + "1E+" + i + "::numeric";
+      for (int i = 0; i < 32; i++) {
+        final String input = (i == 0) ? sign + "1" : sign + String.format("1%0" + i + "d", 0);
+        final String sql = "SELECT " + input + "::bignumeric(38,0)";
         ResultSet rs = statement.executeQuery(sql);
         rs.next();
         if (i == 0) {
-          final String expected = sign + "1";
-          assertEquals("getString for " + sql, expected, rs.getString(1));
-          assertEquals("getBigDecimal for " + sql, expected, rs.getBigDecimal(1).toString());
+          assertEquals("getString for " + sql, input, rs.getString(1));
+          assertEquals("getBigDecimal for " + sql, input, rs.getBigDecimal(1).toString());
         } else {
-          final String expected = sign + String.format("1%0" + i + "d", 0);
-          assertEquals("getString for " + sql, expected, rs.getString(1));
-          assertEquals("getBigDecimal for " + sql, expected, rs.getBigDecimal(1).toString());
+          assertEquals("getString for " + sql, input, rs.getString(1));
+          assertEquals("getBigDecimal for " + sql, input, rs.getBigDecimal(1).toString());
         }
         rs.close();
       }
@@ -69,9 +68,9 @@ public class NumericTransferTest extends BaseTest4 {
 
   @Test
   public void sendReceive100000() throws SQLException {
-    PreparedStatement statement = con.prepareStatement("select ?::numeric");
+    PreparedStatement statement = con.prepareStatement("select ?::bignumeric(38,0)");
     for (String sign : new String[]{"", "-"}) {
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 32; i++) {
         final String expected = sign + (i == 0 ? 1 : String.format("1%0" + i + "d", 0));
         statement.setBigDecimal(1, new BigDecimal(expected));
         ResultSet rs = statement.executeQuery();

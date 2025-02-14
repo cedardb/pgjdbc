@@ -17,6 +17,7 @@ import org.junit.runners.Parameterized;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,7 +48,7 @@ public class NumericTransferTest2 extends BaseTest4 {
     for (BinaryMode binaryMode : BinaryMode.values()) {
       numbers.add(new Object[]{binaryMode, new BigDecimal("1.0")});
       numbers.add(new Object[]{binaryMode, new BigDecimal("0.000000000000000000000000000000000000000000000000000")});
-      numbers.add(new Object[]{binaryMode, new BigDecimal("0.100000000000000000000000000000000000000000000009900")});
+      numbers.add(new Object[]{binaryMode, new BigDecimal("0.1000000000000000000000000000000009900")});
       numbers.add(new Object[]{binaryMode, new BigDecimal("-1.0")});
       numbers.add(new Object[]{binaryMode, new BigDecimal("-1")});
       numbers.add(new Object[]{binaryMode, new BigDecimal("1.2")});
@@ -82,8 +83,8 @@ public class NumericTransferTest2 extends BaseTest4 {
       numbers.add(new Object[]{binaryMode, new BigDecimal("20000.00000000000000000000")});
       numbers.add(new Object[]{binaryMode, new BigDecimal("9990000").setScale(10)});
       numbers.add(new Object[]{binaryMode, new BigDecimal("1000000").setScale(20)});
-      numbers.add(new Object[]{binaryMode, new BigDecimal("10000000000000000000000000000000000000").setScale(20)});
-      numbers.add(new Object[]{binaryMode, new BigDecimal("90000000000000000000000000000000000000")});
+      numbers.add(new Object[]{binaryMode, new BigDecimal("100000000000000000").setScale(20)});
+      numbers.add(new Object[]{binaryMode, new BigDecimal("900000000000000000")});
     }
     return numbers;
   }
@@ -92,10 +93,10 @@ public class NumericTransferTest2 extends BaseTest4 {
   public void receiveValue() throws SQLException {
     final String valString = value.toPlainString();
     try (Statement statement = con.createStatement()) {
-      final String sql = "SELECT " + valString + "::numeric";
+      final String sql = "SELECT " + valString + "::bignumeric";
       try (ResultSet rs = statement.executeQuery(sql)) {
         assertTrue(rs.next());
-        assertEquals("getBigDecimal for " + sql, valString, rs.getBigDecimal(1).toPlainString());
+        assertEquals("getBigDecimal for " + sql, value.setScale(6, RoundingMode.DOWN), rs.getBigDecimal(1));
       }
     }
   }
@@ -103,11 +104,11 @@ public class NumericTransferTest2 extends BaseTest4 {
   @Test
   public void sendReceiveValue() throws SQLException {
     final String valString = value.toPlainString();
-    try (PreparedStatement statement = con.prepareStatement("select ?::numeric")) {
+    try (PreparedStatement statement = con.prepareStatement("select ?::bignumeric")) {
       statement.setBigDecimal(1, value);
       try (ResultSet rs = statement.executeQuery()) {
         rs.next();
-        assertEquals("getBigDecimal for " + valString, valString, rs.getBigDecimal(1).toPlainString());
+        assertEquals("getBigDecimal for " + valString, value.setScale(6, RoundingMode.DOWN), rs.getBigDecimal(1));
       }
     }
   }

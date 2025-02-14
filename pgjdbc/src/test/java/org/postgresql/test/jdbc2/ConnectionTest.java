@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.postgresql.PGConnection;
 import org.postgresql.PGProperty;
 import org.postgresql.core.PGStream;
@@ -48,7 +50,7 @@ class ConnectionTest {
     con = TestUtil.openDB();
 
     TestUtil.createTable(con, "test_a", "imagename name,image oid,id int4");
-    TestUtil.createTable(con, "test_c", "source text,cost money,imageid int4");
+    TestUtil.createTable(con, "test_c", "source text,cost int,imageid int4");
 
     TestUtil.closeDB(con);
   }
@@ -329,7 +331,8 @@ class ConnectionTest {
     con.setAutoCommit(true);
     assertTrue(con.isReadOnly());
     //with autocommit true and read only, can still insert
-    assertEquals(1, st.executeUpdate("insert into test_a (imagename,image,id) values ('comttest',1234,5678)"));
+    int result = st.executeUpdate("insert into test_a (imagename,image,id) values ('comttest',1234,5678)");
+    assertEquals(1, result);
 
     // Now update image to 9876
     st.executeUpdate("update test_a set image=9876 where id=5678");
@@ -421,6 +424,7 @@ class ConnectionTest {
    * Transaction Isolation Levels
    */
   @Test
+  @Disabled("We don't support different isolation levels yet")
   void transactionIsolation() throws Exception {
     con = TestUtil.openDB();
 

@@ -71,13 +71,13 @@ public class BatchExecuteTest extends BaseTest4 {
 
     // Drop the test table if it already exists for some reason. It is
     // not an error if it doesn't exist.
-    TestUtil.createTempTable(con, "testbatch", "pk INTEGER, col1 INTEGER");
+    TestUtil.createTable(con, "testbatch", "pk INTEGER, col1 INTEGER");
 
     stmt.executeUpdate("INSERT INTO testbatch VALUES (1, 0)");
 
-    TestUtil.createTempTable(con, "prep", "a integer, b integer, d date");
+    TestUtil.createTable(con, "prep", "a integer, b integer, d date");
 
-    TestUtil.createTempTable(con, "batchUpdCnt", "id varchar(512) primary key, data varchar(512)");
+    TestUtil.createTable(con, "batchUpdCnt", "id varchar(512) primary key, data varchar(512)");
     stmt.executeUpdate("INSERT INTO batchUpdCnt(id) VALUES ('key-2')");
 
     stmt.close();
@@ -93,6 +93,8 @@ public class BatchExecuteTest extends BaseTest4 {
     con.setAutoCommit(true);
 
     TestUtil.dropTable(con, "testbatch");
+    TestUtil.dropTable(con, "prep");
+    TestUtil.dropTable(con, "batchUpdCnt");
     super.tearDown();
   }
 
@@ -387,18 +389,20 @@ public class BatchExecuteTest extends BaseTest4 {
   @Test
   public void testWarningsAreCleared() throws SQLException {
     Statement stmt = con.createStatement();
-    stmt.addBatch("CREATE TEMP TABLE unused (a int primary key)");
+    stmt.addBatch("CREATE TABLE unused (a int primary key)");
     stmt.executeBatch();
     // Execute an empty batch to clear warnings.
     stmt.executeBatch();
     Assert.assertNull(stmt.getWarnings());
+    stmt.execute("DROP TABLE unused");
+
     TestUtil.closeQuietly(stmt);
   }
 
   @Test
   public void testBatchEscapeProcessing() throws SQLException {
     Statement stmt = con.createStatement();
-    stmt.execute("CREATE TEMP TABLE batchescape (d date)");
+    stmt.execute("CREATE TABLE batchescape (d date)");
 
     stmt.addBatch("INSERT INTO batchescape (d) VALUES ({d '2007-11-20'})");
     stmt.executeBatch();
@@ -415,13 +419,14 @@ public class BatchExecuteTest extends BaseTest4 {
     Assert.assertTrue(rs.next());
     Assert.assertEquals("2007-11-20", rs.getString(1));
     Assert.assertTrue(!rs.next());
+    stmt.execute("DROP TABLE batchescape");
     TestUtil.closeQuietly(stmt);
   }
 
   @Test
   public void testBatchWithEmbeddedNulls() throws SQLException {
     Statement stmt = con.createStatement();
-    stmt.execute("CREATE TEMP TABLE batchstring (a text)");
+    stmt.execute("CREATE TABLE batchstring (a text)");
 
     con.commit();
 
@@ -444,6 +449,7 @@ public class BatchExecuteTest extends BaseTest4 {
     ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM batchstring");
     Assert.assertTrue(rs.next());
     Assert.assertEquals(0, rs.getInt(1));
+    stmt.execute("DROP TABLE batchstring");
     TestUtil.closeQuietly(stmt);
   }
 
@@ -745,7 +751,7 @@ org.postgresql.util.PSQLException: ERROR: incorrect binary data format in bind p
   public void testBatchWithAlternatingTypes() throws SQLException {
     try {
       Statement s = con.createStatement();
-      s.execute("BEGIN");
+      s.execute("COMMIT; BEGIN");
       PreparedStatement ps;
       ps = con.prepareStatement("insert into prep(a,b)  values(?::int4,?)");
       ps.setInt(1, 2);

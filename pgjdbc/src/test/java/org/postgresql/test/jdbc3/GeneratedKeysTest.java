@@ -12,6 +12,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
+
 import org.postgresql.PGStatement;
 import org.postgresql.core.ServerVersion;
 import org.postgresql.test.TestUtil;
@@ -90,7 +92,7 @@ public class GeneratedKeysTest extends BaseTest4 {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    TestUtil.createTempTable(con, "genkeys", "a serial, b varchar(5), c int");
+    TestUtil.createTable(con, "genkeys", "a serial, b varchar(5), c int");
   }
 
   @Override
@@ -225,6 +227,7 @@ public class GeneratedKeysTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support inserts in subqueries yet")
   public void testWithInsertInsert() throws SQLException {
     assumeMinimumServerVersion(ServerVersion.v9_1);
     Statement stmt = con.createStatement();
@@ -239,6 +242,7 @@ public class GeneratedKeysTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support inserts in subqueries yet")
   public void testWithInsertSelect() throws SQLException {
     assumeMinimumServerVersion(ServerVersion.v9_1);
     Assume.assumeTrue(returningInQuery != ReturningInQuery.NO);

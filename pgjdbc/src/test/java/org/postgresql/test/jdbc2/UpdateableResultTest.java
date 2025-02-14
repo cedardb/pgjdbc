@@ -19,6 +19,7 @@ import org.postgresql.test.TestUtil;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
@@ -44,13 +45,15 @@ public class UpdateableResultTest extends BaseTest4 {
     TestUtil.createTable(con, "hasdate", "id int primary key, dt date unique, name text");
     TestUtil.createTable(con, "unique_null_constraint", "u1 int unique, name1 text");
     TestUtil.createTable(con, "uniquekeys", "id int unique not null, id2 int unique, dt date");
-    TestUtil.createTable(con, "partialunique", "subject text, target text, success boolean");
-    TestUtil.execute(con, "CREATE UNIQUE INDEX tests_success_constraint ON partialunique (subject, target) WHERE success");
+    // We don't support partial indexes yet
+    //TestUtil.createTable(con, "partialunique", "subject text, target text, success boolean");
+    //TestUtil.execute(con, "CREATE UNIQUE INDEX tests_success_constraint ON partialunique (subject, target) WHERE success");
     TestUtil.createTable(con, "second", "id1 int primary key, name1 text");
     TestUtil.createTable(con, "primaryunique", "id int primary key, name text unique not null, dt date");
     TestUtil.createTable(con, "serialtable", "gen_id serial primary key, name text");
     TestUtil.createTable(con, "compositepktable", "gen_id serial, name text, dec_id serial");
-    TestUtil.execute(con, "alter sequence compositepktable_dec_id_seq increment by 10; alter sequence compositepktable_dec_id_seq restart with 10");
+    // We don't support alter sequence yet
+    // TestUtil.execute(con, "alter sequence compositepktable_dec_id_seq increment by 10; alter sequence compositepktable_dec_id_seq restart with 10");
     TestUtil.execute(con, "alter table compositepktable add primary key ( gen_id, dec_id )");
     TestUtil.createTable(con, "stream", "id int primary key, asi text, chr text, bin bytea");
     TestUtil.createTable(con, "multicol", "id1 int not null, id2 int not null, val text");
@@ -83,7 +86,7 @@ public class UpdateableResultTest extends BaseTest4 {
     TestUtil.dropTable(con, "unique_null_constraint");
     TestUtil.dropTable(con, "hasdate");
     TestUtil.dropTable(con, "uniquekeys");
-    TestUtil.dropTable(con, "partialunique");
+    //TestUtil.dropTable(con, "partialunique");
     TestUtil.dropTable(con, "primaryunique");
     super.tearDown();
   }
@@ -266,7 +269,7 @@ public class UpdateableResultTest extends BaseTest4 {
       assertTrue(rs.first());
       assertEquals(1, rs.getInt("gen_id"));
       assertEquals(dec, rs.getString("name"));
-      assertEquals(10, rs.getInt("dec_id"));
+      assertEquals(1, rs.getInt("dec_id"));
 
       rs.moveToInsertRow();
       rs.updateString("name", dec);
@@ -275,7 +278,7 @@ public class UpdateableResultTest extends BaseTest4 {
       assertTrue(rs.last());
       assertEquals(2, rs.getInt("gen_id"));
       assertEquals(dec, rs.getString("name"));
-      assertEquals(20, rs.getInt("dec_id"));
+      assertEquals(2, rs.getInt("dec_id"));
 
     } finally {
       TestUtil.closeQuietly(rs);
@@ -748,6 +751,7 @@ public class UpdateableResultTest extends BaseTest4 {
     assertTrue(rs.getBoolean("b"));
   }
 
+  @Ignore("We don't support updates in pg_class for now")
   @Test
   public void testOidUpdatable() throws Exception {
     Connection privilegedCon = TestUtil.openPrivilegedDB();

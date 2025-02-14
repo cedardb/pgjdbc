@@ -38,7 +38,7 @@ public class PGTimeTest extends BaseTest4 {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    TestUtil.createTempTable(con, TEST_TABLE, "tm time, tz time with time zone");
+    TestUtil.createTempTable(con, TEST_TABLE, "tm time");
   }
 
   @Override
@@ -64,15 +64,6 @@ public class PGTimeTest extends BaseTest4 {
     verifyTimeWithInterval(new PGTime(now), new PGInterval(0, 0, 0, 1, 2, 3.14), true);
     verifyTimeWithInterval(new PGTime(now), new PGInterval(0, 0, 0, 1, 2, 3.14), false);
 
-    verifyTimeWithInterval(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT"))),
-        new PGInterval(0, 0, 0, 1, 2, 3.14), true);
-    verifyTimeWithInterval(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT"))),
-        new PGInterval(0, 0, 0, 1, 2, 3.14), false);
-
-    verifyTimeWithInterval(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT+01:00"))),
-        new PGInterval(0, 0, 0, 1, 2, 3.456), true);
-    verifyTimeWithInterval(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT+01:00"))),
-        new PGInterval(0, 0, 0, 1, 2, 3.456), false);
   }
 
   /**
@@ -142,14 +133,7 @@ public class PGTimeTest extends BaseTest4 {
     verifyInsertAndSelect(new PGTime(now), true);
     verifyInsertAndSelect(new PGTime(now), false);
 
-    verifyInsertAndSelect(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT"))), true);
-    verifyInsertAndSelect(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT"))),
-        false);
 
-    verifyInsertAndSelect(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT+01:00"))),
-        true);
-    verifyInsertAndSelect(new PGTime(now, Calendar.getInstance(TimeZone.getTimeZone("GMT+01:00"))),
-        false);
   }
 
   /**
@@ -166,9 +150,9 @@ public class PGTimeTest extends BaseTest4 {
     String sql;
     if (time.getCalendar() != null) {
       sql =
-          "INSERT INTO " + TEST_TABLE + " VALUES (?::time with time zone, ?::time with time zone)";
+          "INSERT INTO " + TEST_TABLE + " VALUES (?::time with time zone)";
     } else {
-      sql = "INSERT INTO " + TEST_TABLE + " VALUES (?::time, ?::time)";
+      sql = "INSERT INTO " + TEST_TABLE + " VALUES (?::time)";
     }
 
     SimpleDateFormat sdf = createSimpleDateFormat(time);
@@ -176,18 +160,15 @@ public class PGTimeTest extends BaseTest4 {
     // Insert the times as casted strings.
     PreparedStatement pstmt1 = con.prepareStatement(sql);
     pstmt1.setString(1, sdf.format(time));
-    pstmt1.setString(2, sdf.format(time));
     assertEquals(1, pstmt1.executeUpdate());
 
     // Insert the times as PGTime objects.
-    PreparedStatement pstmt2 = con.prepareStatement("INSERT INTO " + TEST_TABLE + " VALUES (?, ?)");
+    PreparedStatement pstmt2 = con.prepareStatement("INSERT INTO " + TEST_TABLE + " VALUES (?)");
 
     if (useSetObject) {
       pstmt2.setObject(1, time);
-      pstmt2.setObject(2, time);
     } else {
       pstmt2.setTime(1, time);
-      pstmt2.setTime(2, time);
     }
 
     assertEquals(1, pstmt2.executeUpdate());
@@ -195,14 +176,13 @@ public class PGTimeTest extends BaseTest4 {
     // Query the values back out.
     Statement stmt = con.createStatement();
 
-    ResultSet rs = stmt.executeQuery(TestUtil.selectSQL(TEST_TABLE, "tm,tz"));
+    ResultSet rs = stmt.executeQuery(TestUtil.selectSQL(TEST_TABLE, "tm"));
     assertNotNull(rs);
 
     // Read the casted string values.
     assertTrue(rs.next());
 
     Time tm1 = rs.getTime(1);
-    Time tz1 = rs.getTime(2);
 
     // System.out.println(pstmt1 + " -> " + tm1 + ", " + sdf.format(tz1));
 
@@ -210,13 +190,11 @@ public class PGTimeTest extends BaseTest4 {
     assertTrue(rs.next());
 
     Time tm2 = rs.getTime(1);
-    Time tz2 = rs.getTime(2);
 
     // System.out.println(pstmt2 + " -> " + tm2 + ", " + sdf.format(tz2));
 
     // Verify that the first and second versions match.
     assertEquals(tm1, tm2);
-    assertEquals(tz1, tz2);
 
     // Clean up.
     assertEquals(2, stmt.executeUpdate("DELETE FROM " + TEST_TABLE));

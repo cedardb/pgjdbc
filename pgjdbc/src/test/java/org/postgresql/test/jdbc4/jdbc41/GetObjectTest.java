@@ -87,20 +87,8 @@ class GetObjectTest {
             + "bytea_column bytea,"
             + "lob_column oid,"
             + "array_column text[],"
-            + "point_column point,"
-            + "line_column line,"
-            + "lseg_column lseg,"
-            + "box_column box,"
-            + "path_column path,"
-            + "polygon_column polygon,"
-            + "circle_column circle,"
-            + "money_column money,"
             + "interval_column interval,"
             + (TestUtil.haveMinimumServerVersion(conn, ServerVersion.v8_3) ? "uuid_column uuid," : "")
-            + "inet_column inet,"
-            + "cidr_column cidr,"
-            + "macaddr_column macaddr"
-            + (TestUtil.haveMinimumServerVersion(conn, ServerVersion.v8_3) ? ",xml_column xml" : "")
     );
   }
 
@@ -134,6 +122,7 @@ class GetObjectTest {
    * Test the behavior getObject for string columns.
    */
   @Test
+  @Disabled("We don't support clobs yet")
   void getClob() throws SQLException {
     Statement stmt = conn.createStatement();
     conn.setAutoCommit(false);
@@ -178,10 +167,10 @@ class GetObjectTest {
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("table1", "decimal_column, numeric_column"));
     try {
       assertTrue(rs.next());
-      assertEquals(new BigDecimal("0.1"), rs.getObject("decimal_column", BigDecimal.class));
-      assertEquals(new BigDecimal("0.1"), rs.getObject(1, BigDecimal.class));
-      assertEquals(new BigDecimal("0.1"), rs.getObject("numeric_column", BigDecimal.class));
-      assertEquals(new BigDecimal("0.1"), rs.getObject(2, BigDecimal.class));
+      assertEquals(new BigDecimal("0.100000"), rs.getObject("decimal_column", BigDecimal.class));
+      assertEquals(new BigDecimal("0.100000"), rs.getObject(1, BigDecimal.class));
+      assertEquals(new BigDecimal("0.100000"), rs.getObject("numeric_column", BigDecimal.class));
+      assertEquals(new BigDecimal("0.100000"), rs.getObject(2, BigDecimal.class));
     } finally {
       rs.close();
     }
@@ -529,6 +518,7 @@ class GetObjectTest {
    * Test the behavior getObject for double columns.
    */
   @Test
+  @Disabled("We don't support infinity literals yet")
   void getDouble() throws SQLException {
     try (Statement stmt = conn.createStatement()) {
       stmt.executeUpdate(TestUtil.insertSQL("table1", "double_column", "1.0"));
@@ -574,8 +564,8 @@ class GetObjectTest {
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("table1", "real_column"));
     try {
       assertTrue(rs.next());
-      assertEquals(Float.valueOf(1.0f), rs.getObject("real_column", Float.class));
-      assertEquals(Float.valueOf(1.0f), rs.getObject(1, Float.class));
+      assertEquals(Double.valueOf(1.0f), rs.getObject("real_column", Double.class));
+      assertEquals(Double.valueOf(1.0f), rs.getObject(1, Double.class));
     } finally {
       rs.close();
     }
@@ -592,8 +582,8 @@ class GetObjectTest {
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("table1", "real_column"));
     try {
       assertTrue(rs.next());
-      assertNull(rs.getObject("real_column", Float.class));
-      assertNull(rs.getObject(1, Float.class));
+      assertNull(rs.getObject("real_column", Double.class));
+      assertNull(rs.getObject(1, Double.class));
     } finally {
       rs.close();
     }
@@ -663,6 +653,7 @@ class GetObjectTest {
    * Test the behavior getObject for xml columns.
    */
   @Test
+  @Disabled("We don't support blobs yet")
   void getBlob() throws SQLException {
     Statement stmt = conn.createStatement();
     conn.setAutoCommit(false);
@@ -745,6 +736,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for xml columns.
    */
+  @Disabled
   @Test
   void getXml() throws SQLException {
     if (!TestUtil.haveMinimumServerVersion(conn, ServerVersion.v8_3)) {
@@ -798,6 +790,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for point columns.
    */
+  @Disabled
   @Test
   void getPoint() throws SQLException {
     Statement stmt = conn.createStatement();
@@ -817,6 +810,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for line columns.
    */
+  @Disabled
   @Test
   void getLine() throws SQLException {
     if (!((BaseConnection) conn).haveMinimumServerVersion(ServerVersion.v9_4)) {
@@ -841,6 +835,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for lseg columns.
    */
+  @Disabled
   @Test
   void getLineseg() throws SQLException {
     Statement stmt = conn.createStatement();
@@ -860,6 +855,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for box columns.
    */
+  @Disabled
   @Test
   void getBox() throws SQLException {
     Statement stmt = conn.createStatement();
@@ -879,6 +875,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for path columns.
    */
+  @Disabled
   @Test
   void getPath() throws SQLException {
     Statement stmt = conn.createStatement();
@@ -898,6 +895,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for polygon columns.
    */
+  @Disabled
   @Test
   void getPolygon() throws SQLException {
     Statement stmt = conn.createStatement();
@@ -917,6 +915,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for circle columns.
    */
+  @Disabled
   @Test
   void getCircle() throws SQLException {
     Statement stmt = conn.createStatement();
@@ -978,6 +977,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for inet columns.
    */
+  @Disabled
   @Test
   void getInetAddressNull() throws SQLException, UnknownHostException {
     Statement stmt = conn.createStatement();
@@ -1016,6 +1016,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for ipv4 inet columns.
    */
+  @Disabled
   @Test
   void getInet4Address() throws SQLException, UnknownHostException {
     String inet = "192.168.100.128";
@@ -1028,6 +1029,7 @@ class GetObjectTest {
   /**
    * Test the behavior getObject for ipv6 inet columns.
    */
+  @Disabled
   @Test
   void getInet6Address() throws SQLException, UnknownHostException {
     String inet = "2001:4f8:3:ba:2e0:81ff:fe22:d1f1";

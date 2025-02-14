@@ -8,6 +8,8 @@ package org.postgresql.test.jdbc4;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
+
 import org.postgresql.core.ServerVersion;
 import org.postgresql.core.TransactionState;
 import org.postgresql.test.TestUtil;
@@ -47,6 +49,7 @@ public class IsValidTest extends BaseTest4 {
   }
 
   @Test
+  @Ignore("We don't support pg_terminate_backend()")
   public void testIsValidRemoteClose() throws SQLException, InterruptedException {
     Assume.assumeTrue("Unable to use pg_terminate_backend(...) before version 8.4", TestUtil.haveMinimumServerVersion(con, ServerVersion.v8_4));
 

@@ -64,7 +64,7 @@ public class JsonbTest extends BaseTest4 {
   public void testJsonbNonPreparedStatement() throws SQLException {
     Statement stmt = con.createStatement();
 
-    ResultSet rs = stmt.executeQuery("SELECT count(1) FROM jsonbtest WHERE detail ? 'a' = false;");
+    ResultSet rs = stmt.executeQuery("SELECT count(1) FROM jsonbtest WHERE detail ->> 'a' is null;");
     assertTrue(rs.next());
     assertEquals(2, rs.getInt(1));
     rs.close();
@@ -73,7 +73,7 @@ public class JsonbTest extends BaseTest4 {
 
   @Test
   public void testJsonbPreparedStatement() throws SQLException {
-    PreparedStatement stmt = con.prepareStatement("SELECT count(1) FROM jsonbtest WHERE detail ?? 'a' = false;");
+    PreparedStatement stmt = con.prepareStatement("SELECT count(1) FROM jsonbtest WHERE detail ->> 'a' is null;");
     ResultSet rs = stmt.executeQuery();
     assertTrue(rs.next());
     assertEquals(2, rs.getInt(1));
