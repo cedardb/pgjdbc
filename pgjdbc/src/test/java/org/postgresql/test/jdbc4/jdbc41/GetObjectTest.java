@@ -518,7 +518,6 @@ class GetObjectTest {
    * Test the behavior getObject for double columns.
    */
   @Test
-  @Disabled("We don't support infinity literals yet")
   void getDouble() throws SQLException {
     try (Statement stmt = conn.createStatement()) {
       stmt.executeUpdate(TestUtil.insertSQL("table1", "double_column", "1.0"));
@@ -564,8 +563,8 @@ class GetObjectTest {
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("table1", "real_column"));
     try {
       assertTrue(rs.next());
-      assertEquals(Double.valueOf(1.0f), rs.getObject("real_column", Double.class));
-      assertEquals(Double.valueOf(1.0f), rs.getObject(1, Double.class));
+      assertEquals(Float.valueOf(1.0f), rs.getObject("real_column", Float.class));
+      assertEquals(Float.valueOf(1.0f), rs.getObject(1, Float.class));
     } finally {
       rs.close();
     }
@@ -582,8 +581,8 @@ class GetObjectTest {
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("table1", "real_column"));
     try {
       assertTrue(rs.next());
-      assertNull(rs.getObject("real_column", Double.class));
-      assertNull(rs.getObject(1, Double.class));
+      assertNull(rs.getObject("real_column", Float.class));
+      assertNull(rs.getObject(1, Float.class));
     } finally {
       rs.close();
     }
