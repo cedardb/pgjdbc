@@ -42,8 +42,7 @@ public class OidValuesCorrectnessTest extends BaseTest4 {
    */
   private static List<String> oidsToIgnore = Arrays.asList(
       "UNSPECIFIED",//UNSPECIFIED isn't an Oid, it's a value to specify that Oid value is unspecified
-      "FLOAT4", // We don't support the following types yet
-      "FLOAT4_ARRAY",
+      // We don't support the following types yet
       "TIMETZ",
       "TIMETZ_ARRAY",
       "OID",
