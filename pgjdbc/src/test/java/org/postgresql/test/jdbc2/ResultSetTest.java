@@ -106,7 +106,7 @@ public class ResultSetTest extends BaseTest4 {
     stmt.executeUpdate("INSERT INTO testboolstring VALUES('1.0', null)");
     stmt.executeUpdate("INSERT INTO testboolstring VALUES('0.0', null)");
 
-    TestUtil.createTable(con, "testboolfloat", "i int, a real, b boolean");
+    TestUtil.createTable(con, "testboolfloat", "i int, a float4, b boolean");
     stmt.executeUpdate("INSERT INTO testboolfloat VALUES(1, '1.0'::real, true)");
     stmt.executeUpdate("INSERT INTO testboolfloat VALUES(2, '0.0'::real, false)");
     stmt.executeUpdate("INSERT INTO testboolfloat VALUES(3, 1.000::real, true)");
@@ -379,7 +379,7 @@ public class ResultSetTest extends BaseTest4 {
     testgetBoolean("int2"); // SMALLINT
     testgetBoolean("int4"); // INTEGER
     testgetBoolean("int8"); // BIGINT
-    testgetBoolean("real"); // REAL
+    testgetBoolean("float4"); // REAL
     testgetBoolean("float8"); // FLOAT, DOUBLE
     testgetBoolean("numeric(1,0)"); // DECIMAL, NUMERIC
     testgetBoolean("char"); // CHAR
