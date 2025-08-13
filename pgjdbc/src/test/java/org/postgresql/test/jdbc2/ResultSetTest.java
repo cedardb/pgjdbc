@@ -745,6 +745,10 @@ public class ResultSetTest extends BaseTest4 {
     }
     rs.close();
 
+    // Cedar needs one digit extra precision printed to pass these tests
+    con.createStatement().executeUpdate("set extra_float_digits = 2");
+
+
     rs = con.createStatement().executeQuery("select i, a from testboolfloat order by i");
 
     assertTrue(rs.next());
@@ -794,6 +798,10 @@ public class ResultSetTest extends BaseTest4 {
       } catch (SQLException e) {
       }
     } while (rs.next());
+
+    // Reset the precision to default
+    con.createStatement().executeUpdate("set extra_float_digits = 1");
+
 
     rs.close();
   }
