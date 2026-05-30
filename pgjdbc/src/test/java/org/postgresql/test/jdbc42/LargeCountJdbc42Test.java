@@ -57,7 +57,7 @@ public class LargeCountJdbc42Test extends BaseTest4 {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    TestUtil.createUnloggedTable(con, "largetable", "a boolean");
+    TestUtil.createTempTable(con, "largetable", "a boolean");
   }
 
   @Override
