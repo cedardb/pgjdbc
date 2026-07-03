@@ -71,7 +71,7 @@ public class DateTest extends BaseTest4 {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    TestUtil.createTable(con, "test", "dt ".concat(type));
+    TestUtil.createTable(con, "test", "id serial, dt ".concat(type));
   }
 
   @After
@@ -89,27 +89,27 @@ public class DateTest extends BaseTest4 {
     assumeTrue("TODO: Test fails on some server versions with local time zones (not GMT based)",
         false == Objects.equals(type, "timestamptz") || zoneId.startsWith("GMT"));
     try (Statement stmt = con.createStatement()) {
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1950-02-07'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1970-06-02'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1999-08-11'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'2001-02-13'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1950-04-02'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1970-11-30'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1988-01-01'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'2003-07-09'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1934-02-28'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1969-04-03'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1982-08-03'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'2012-03-15'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1912-05-01'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1971-12-15'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'1984-12-03'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'2000-01-01'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'3456-01-01'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'0101-01-01 BC'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'0001-01-01'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'0001-01-01 BC'")));
-      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "'0001-12-31 BC'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1950-02-07'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1970-06-02'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1999-08-11'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'2001-02-13'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1950-04-02'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1970-11-30'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1988-01-01'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'2003-07-09'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1934-02-28'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1969-04-03'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1982-08-03'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'2012-03-15'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1912-05-01'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1971-12-15'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'1984-12-03'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'2000-01-01'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'3456-01-01'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'0101-01-01 BC'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'0001-01-01'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'0001-01-01 BC'")));
+      assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("test", "dt", "'0001-12-31 BC'")));
 
       /* dateTest() contains all of the tests */
       dateTest();
@@ -124,7 +124,7 @@ public class DateTest extends BaseTest4 {
   @Test
   public void testSetDate() throws SQLException {
     try (Statement stmt = con.createStatement()) {
-      PreparedStatement ps = con.prepareStatement(TestUtil.insertSQL("test", "?"));
+      PreparedStatement ps = con.prepareStatement(TestUtil.insertSQL("test", "dt", "?"));
 
       ps.setDate(1, makeDate(1950, 2, 7));
       assertEquals(1, ps.executeUpdate());
@@ -207,7 +207,7 @@ public class DateTest extends BaseTest4 {
     ResultSet rs;
     java.sql.Date d;
 
-    rs = st.executeQuery(TestUtil.selectSQL("test", "dt"));
+    rs = st.executeQuery(TestUtil.selectSQL("test", "dt", null, "ORDER BY id"));
     assertNotNull(rs);
 
     assertTrue(rs.next());
