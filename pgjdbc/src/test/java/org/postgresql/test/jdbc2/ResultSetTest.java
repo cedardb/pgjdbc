@@ -138,45 +138,45 @@ public class ResultSetTest extends BaseTest4 {
 
     // TestUtil.createTable(con, "testbit", "a bit");
 
-    TestUtil.createTable(con, "testnumeric", "t text, a bignumeric(38,14)");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('1.0', '1.0')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('0.0', '0.0')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-1.0', '-1.0')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('1.2', '1.2')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-2.5', '-2.5')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('0.0000000000990', '0.0000000000990')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('10.0000000000099', '10.0000000000099')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('.10000000000000', '.10000000000000')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('.10', '.10')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('1.10000000000000', '1.10000000000000')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('99999.2', '99999.2')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('99999', '99999')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-99999.2', '-99999.2')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-99999', '-99999')");
+    TestUtil.createTable(con, "testnumeric", "id serial, t text, a bignumeric(38,14)");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('1.0', '1.0')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('0.0', '0.0')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-1.0', '-1.0')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('1.2', '1.2')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-2.5', '-2.5')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('0.0000000000990', '0.0000000000990')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('10.0000000000099', '10.0000000000099')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('.10000000000000', '.10000000000000')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('.10', '.10')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('1.10000000000000', '1.10000000000000')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('99999.2', '99999.2')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('99999', '99999')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-99999.2', '-99999.2')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-99999', '-99999')");
 
     // Integer.MaxValue
-    stmt.execute("INSERT INTO testnumeric VALUES('2147483647', '2147483647')");
+    stmt.execute("INSERT INTO testnumeric (t, a) VALUES('2147483647', '2147483647')");
 
     // Integer.MinValue
-    stmt.execute("INSERT INTO testnumeric VALUES( '-2147483648', '-2147483648')");
+    stmt.execute("INSERT INTO testnumeric (t, a) VALUES( '-2147483648', '-2147483648')");
 
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('2147483648', '2147483648')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-2147483649', '-2147483649')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('2147483648', '2147483648')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-2147483649', '-2147483649')");
 
     // Long.MaxValue
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('9223372036854775807','9223372036854775807')");
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('9223372036854775807.9', '9223372036854775807.9')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('9223372036854775807','9223372036854775807')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('9223372036854775807.9', '9223372036854775807.9')");
 
     // Long.MinValue
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-9223372036854775808', '-9223372036854775808')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-9223372036854775808', '-9223372036854775808')");
 
     // Long.MaxValue +1
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('9223372036854775808', '9223372036854775808')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('9223372036854775808', '9223372036854775808')");
 
     // Long.Minvalue -1
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('-9223372036854775809', '-9223372036854775809')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('-9223372036854775809', '-9223372036854775809')");
 
-    stmt.executeUpdate("INSERT INTO testnumeric VALUES('10223372036850000000', '10223372036850000000')");
+    stmt.executeUpdate("INSERT INTO testnumeric (t, a) VALUES('10223372036850000000', '10223372036850000000')");
 
     TestUtil.createTable(con, "testpgobject", "id integer NOT NULL, d date, PRIMARY KEY (id)");
     stmt.execute("INSERT INTO testpgobject VALUES(1, '2010-11-3')");
@@ -454,7 +454,7 @@ public class ResultSetTest extends BaseTest4 {
 
   @Test
   public void testgetByte() throws SQLException {
-    ResultSet rs = con.createStatement().executeQuery("select a from testnumeric");
+    ResultSet rs = con.createStatement().executeQuery("select a from testnumeric order by id");
 
     assertTrue(rs.next());
     assertEquals(1, rs.getByte(1));
@@ -499,7 +499,7 @@ public class ResultSetTest extends BaseTest4 {
 
   @Test
   public void testgetShort() throws SQLException {
-    ResultSet rs = con.createStatement().executeQuery("select a from testnumeric");
+    ResultSet rs = con.createStatement().executeQuery("select a from testnumeric order by id");
 
     assertTrue(rs.next());
     assertEquals(1, rs.getShort(1));
@@ -543,7 +543,7 @@ public class ResultSetTest extends BaseTest4 {
 
   @Test
   public void testgetInt() throws SQLException {
-    ResultSet rs = con.createStatement().executeQuery("select a from testnumeric");
+    ResultSet rs = con.createStatement().executeQuery("select a from testnumeric order by id");
 
     assertTrue(rs.next());
     assertEquals(1, rs.getInt(1));
