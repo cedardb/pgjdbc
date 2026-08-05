@@ -58,8 +58,8 @@ class ScramTest {
    * <p>https://github.com/pgjdbc/pgjdbc/issues/1970
    */
   @ParameterizedTest
-  @ValueSource(strings = {"My Space", "$ec ret", " rover june spelling ",
-      "!zj5hs*k5 STj@DaRUy", "q\u00A0w\u2000e\u2003r\u2009t\u3000y"})
+  @ValueSource(strings = {"My Space!1aA", "$ec ret!1aA", " rover june spelling !1aA",
+      "!zj5hs*k5 STj@DaRUy", "q\u00A0w\u2000e\u2003r\u2009t\u3000y!1aA"})
   void passwordWithSpace(String passwd) throws SQLException {
     createRole(passwd); // Create role password with spaces.
 
@@ -82,8 +82,8 @@ class ScramTest {
    * <p>https://github.com/pgjdbc/pgjdbc/issues/2000
    */
   @ParameterizedTest
-  @ValueSource(strings = {"My Space", "$ec ret", "rover june spelling",
-      "!zj5hs*k5 STj@DaRUy", "q\u00A0w\u2000e\u2003r\u2009t\u3000y"})
+  @ValueSource(strings = {"My Space!1aA", "$ec ret!1aA", "rover june spelling!1aA",
+      "!zj5hs*k5 STj@DaRUy", "q\u00A0w\u2000e\u2003r\u2009t\u3000y!1aA"})
   void passwordWithoutSpace(String passwd) throws SQLException {
     String passwdNoSpaces = passwd.codePoints()
         .filter(i -> !Character.isSpaceChar(i))
@@ -111,7 +111,7 @@ class ScramTest {
   @MethodSource("provideArgsForTestInvalid")
   void invalidPasswords(String password, String expectedMessage) throws SQLException {
     // We are testing invalid passwords so that correct one does not matter
-    createRole("anything_goes_here");
+    createRole("anything_goes_here!1aA");
 
     Properties props = new Properties();
     PGProperty.USER.set(props, ROLE_NAME);

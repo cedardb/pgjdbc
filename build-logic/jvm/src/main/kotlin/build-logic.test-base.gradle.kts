@@ -40,8 +40,7 @@ tasks.configureEach<Test> {
     // We don't support the money type
     exclude("**/*JBuilderTest*")
 
-    // We don't support scram
-    exclude("**/*ScramTest*")
+    // We don't support all password utils
     exclude("**/*AuthenticationPluginTest*")
     exclude("**/*PasswordUtilTest*")
 
