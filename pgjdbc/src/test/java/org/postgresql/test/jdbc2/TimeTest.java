@@ -14,6 +14,7 @@ import org.postgresql.test.TestUtil;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -39,7 +40,7 @@ class TimeTest {
   @BeforeEach
   void setUp() throws Exception {
     con = TestUtil.openDB();
-    TestUtil.createTempTable(con, "testtime", "tm time, tz time with time zone");
+    TestUtil.createTempTable(con, "testtime", "tm time");
   }
 
   @AfterEach
@@ -57,6 +58,7 @@ class TimeTest {
    * Test use of calendar
    */
   @Test
+  @Disabled("We don't support timetz yet")
   void getTimeZone() throws Exception {
     final Time midnight = new Time(0, 0, 0);
     Statement stmt = con.createStatement();

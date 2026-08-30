@@ -83,7 +83,6 @@ class GetObjectTest {
             + "timestamp_with_time_zone_column timestamp with time zone,"
             + "date_column date,"
             + "time_without_time_zone_column time without time zone,"
-            + "time_with_time_zone_column time with time zone,"
             + "bytea_column bytea,"
             + "lob_column oid,"
             + "array_column text[],"

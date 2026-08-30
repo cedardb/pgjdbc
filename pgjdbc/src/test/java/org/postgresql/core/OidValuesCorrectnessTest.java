@@ -67,10 +67,7 @@ public class OidValuesCorrectnessTest extends BaseTest4 {
       "MACADDR",
       "MACADDR8",
       "TSVECTOR",
-      "TSQUERY",
-      "VARCHAR_ARRAY", // We only support text arrays
-      "CHAR", // We only support blank padded chars or varchars
-      "CHAR_ARRAY"
+      "TSQUERY"
   );
 
 
