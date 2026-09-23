@@ -40,7 +40,7 @@ class TimeTest {
   @BeforeEach
   void setUp() throws Exception {
     con = TestUtil.openDB();
-    TestUtil.createTempTable(con, "testtime", "tm time");
+    TestUtil.createTempTable(con, "testtime", "id serial, tm time");
   }
 
   @AfterEach
@@ -131,14 +131,14 @@ class TimeTest {
   void getTime() throws SQLException {
     Statement stmt = con.createStatement();
 
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'01:02:03'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'23:59:59'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'12:00:00'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'05:15:21'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'16:21:51'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'12:15:12'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'22:12:01'")));
-    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'08:46:44'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'01:02:03'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'23:59:59'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'12:00:00'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'05:15:21'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'16:21:51'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'12:15:12'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'22:12:01'")));
+    assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "tm", "'08:46:44'")));
 
     // Fall through helper
     timeTest();
@@ -152,7 +152,7 @@ class TimeTest {
    */
   @Test
   void setTime() throws SQLException {
-    PreparedStatement ps = con.prepareStatement(TestUtil.insertSQL("testtime", "?"));
+    PreparedStatement ps = con.prepareStatement(TestUtil.insertSQL("testtime", "tm", "?"));
     Statement stmt = con.createStatement();
 
     ps.setTime(1, makeTime(1, 2, 3));
@@ -204,7 +204,7 @@ class TimeTest {
     ResultSet rs;
     Time t;
 
-    rs = st.executeQuery(TestUtil.selectSQL("testtime", "tm"));
+    rs = st.executeQuery(TestUtil.selectSQL("testtime", "tm", null, "ORDER BY id"));
     assertNotNull(rs);
 
     assertTrue(rs.next());
