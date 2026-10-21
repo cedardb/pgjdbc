@@ -26,6 +26,10 @@ tasks.configureEach<Test> {
 
     // CedarDB-specific excludes with justification
 
+    // DateStyleTest expects pgjdbc to disconnect after a successful switch to non-ISO output.
+    // CedarDB supports only ISO output and rejects the setting on the server instead, making the test pointless (and fail).
+    exclude("**/*DateStyleTest*")
+
     // We only support UTF8 encoding
     exclude("**/*ClientEncodingTest*")
 
