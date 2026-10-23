@@ -19,6 +19,7 @@ import org.postgresql.util.PSQLState;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -155,6 +156,7 @@ class SchemaTest {
   }
 
   @Test
+  @Disabled("We ignore the search_path startup parameter")
   void schemaInProperties() throws Exception {
     Properties properties = new Properties();
     properties.setProperty("currentSchema", "schema1");
@@ -223,6 +225,7 @@ class SchemaTest {
   }
 
   @Test
+  @Disabled("We ignore the search_path startup parameter")
   void currentSchemaPropertyVisibilityTableDuringFunctionCreation() throws SQLException {
     Properties properties = new Properties();
     properties.setProperty(PGProperty.CURRENT_SCHEMA.getName(), "public,schema1,schema2");
@@ -269,6 +272,7 @@ class SchemaTest {
   }
 
   @Test
+  @Disabled("We ignore the search_path startup parameter")
   void currentSchemaPropertyVisibilityFunction() throws SQLException {
     currentSchemaPropertyVisibilityTableDuringFunctionCreation();
     Properties properties = new Properties();
@@ -280,6 +284,7 @@ class SchemaTest {
   }
 
   @Test
+  @Disabled("We ignore the search_path startup parameter")
   void currentSchemaPropertyNotVisibilityTableInsideFunction() throws SQLException {
     currentSchemaPropertyVisibilityTableDuringFunctionCreation();
     Properties properties = new Properties();
