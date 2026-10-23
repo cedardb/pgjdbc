@@ -48,13 +48,11 @@ tasks.configureEach<Test> {
     exclude("**/*AuthenticationPluginTest*")
     exclude("**/*PasswordUtilTest*")
 
-    // Missing DROP SCHEMA
-    exclude("**/*OptionsProperty*")
-    exclude("**/*SchemaTest*")
+    // We ignore the options startup parameter
+    exclude("**/*OptionsPropertyTest*")
 
+    // We don't support table row types (e.g. 'tbl'::regtype)
     exclude("**/*SearchPathLookupTest*")
-    exclude("**/jdbc4/DatabaseMetaDataTest*")
-    exclude("**/jdbc42/DatabaseMetaDataTest*")
 
     // Missing lo_creat
     exclude("**/*BlobTest*")
@@ -120,7 +118,7 @@ tasks.configureEach<Test> {
     exclude("**/*ServerCursorTest*")
     exclude("**/*AdaptiveFetchSizeTest*")
 
-    // We don't support alter database
+    // Our default isolation level is repeatable read, and we don't support serializable
     exclude("**/*DatabaseMetaDataTransactionIsolationTest*")
 
     jvmArgs("-Xmx1536m")
