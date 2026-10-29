@@ -48,9 +48,6 @@ tasks.configureEach<Test> {
     exclude("**/*AuthenticationPluginTest*")
     exclude("**/*PasswordUtilTest*")
 
-    // We ignore the options startup parameter
-    exclude("**/*OptionsPropertyTest*")
-
     // We don't support table row types (e.g. 'tbl'::regtype)
     exclude("**/*SearchPathLookupTest*")
 
@@ -107,9 +104,6 @@ tasks.configureEach<Test> {
 
     // We don't support binary output for arrays
     exclude("**/*ArrayTest*")
-
-    // We don't support all the log properties and levels
-    exclude("**/*LogServerMessagePropertyTest*")
 
     // We don't support row expressions
     exclude("**/*NoColumnMetadataIssue1613Test*")

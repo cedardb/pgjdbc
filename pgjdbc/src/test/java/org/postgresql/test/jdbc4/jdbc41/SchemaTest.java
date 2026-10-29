@@ -156,7 +156,6 @@ class SchemaTest {
   }
 
   @Test
-  @Disabled("We ignore the search_path startup parameter")
   void schemaInProperties() throws Exception {
     Properties properties = new Properties();
     properties.setProperty("currentSchema", "schema1");
@@ -225,7 +224,7 @@ class SchemaTest {
   }
 
   @Test
-  @Disabled("We ignore the search_path startup parameter")
+  @Disabled("We only support SQL functions with a single scalar select expression")
   void currentSchemaPropertyVisibilityTableDuringFunctionCreation() throws SQLException {
     Properties properties = new Properties();
     properties.setProperty(PGProperty.CURRENT_SCHEMA.getName(), "public,schema1,schema2");
@@ -272,7 +271,7 @@ class SchemaTest {
   }
 
   @Test
-  @Disabled("We ignore the search_path startup parameter")
+  @Disabled("We only support SQL functions with a single scalar select expression")
   void currentSchemaPropertyVisibilityFunction() throws SQLException {
     currentSchemaPropertyVisibilityTableDuringFunctionCreation();
     Properties properties = new Properties();
@@ -284,7 +283,7 @@ class SchemaTest {
   }
 
   @Test
-  @Disabled("We ignore the search_path startup parameter")
+  @Disabled("We only support SQL functions with a single scalar select expression")
   void currentSchemaPropertyNotVisibilityTableInsideFunction() throws SQLException {
     currentSchemaPropertyVisibilityTableDuringFunctionCreation();
     Properties properties = new Properties();
